@@ -1,13 +1,11 @@
 package es.uvigo.esei.dai.hybridserver;
 
-public class HtmlDAO {
+import java.util.Map;
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// INTERFAZ con get para que Html manager acceda con el mismo get(uuid) al mapa o a BD.
+public interface HtmlDAO {
 
-	}
-
+	// INTERFAZ con get para que Html manager acceda con el mismo get(uuid) al mapa o a BD.
+	
+	public Map<String, String> getHtmlPage();
+	public Map<String, String> getHtmlList();
 }
