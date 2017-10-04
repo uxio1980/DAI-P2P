@@ -22,17 +22,19 @@ public class ClientService implements Runnable {
 	@Override
 	public void run() {
 		try {
-			HTTPRequest request = new HTTPRequest(
-					new InputStreamReader(socket.getInputStream()));
-			HTTPResponse response = new HTTPResponse();
-			response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
-			response.setStatus(HTTPResponseStatus.S200);
-			response.setContent("Hybrid Server");
+			//while(true) {
+				HTTPRequest request = new HTTPRequest(
+						new InputStreamReader(socket.getInputStream()));
+				HTTPResponse response = new HTTPResponse();
+				response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
+				response.setStatus(HTTPResponseStatus.S200);
+				response.setContent("Hybrid Server " + Thread.currentThread().getName());
 
-			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-			out.println(response);
-			//socket.getOutputStream();
-			socket.getOutputStream().flush();
+				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+				out.println(response);
+				//socket.getOutputStream();
+				socket.getOutputStream().flush();
+			//}
 		} catch (IOException | HTTPParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

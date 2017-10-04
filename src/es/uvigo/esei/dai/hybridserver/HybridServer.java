@@ -56,23 +56,7 @@ public class HybridServer {
 							arraySockets.add(socket);
 							idSession++;
 							if (stop) break;
-							//new Thread (new ClientService(socket)).start();;
-							try {
-								HTTPRequest request = new HTTPRequest(
-										new InputStreamReader(socket.getInputStream()));
-								HTTPResponse response = new HTTPResponse();
-								response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
-								response.setStatus(HTTPResponseStatus.S200);
-								response.setContent("Hybrid Server");
-
-								PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-								out.println(response);
-								//socket.getOutputStream();
-								socket.getOutputStream().flush();
-							} catch (IOException | HTTPParseException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+							new Thread (new ClientService(socket)).start();
 						} catch (Exception e) {
 							System.out.println("Error en servidor:\n" + e.getMessage());
 							System.exit(0);

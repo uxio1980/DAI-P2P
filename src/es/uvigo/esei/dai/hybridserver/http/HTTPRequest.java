@@ -66,18 +66,32 @@ public class HTTPRequest {
 					if(!request[1].equals("/"))
 						resourcePath = request[1].substring(1).split("/");
 	
+					contentLength = -1;
+					Boolean codificado = false;
 					while(!(line = in.readLine()).equals("")){
 						parameter = line.split(": ");
 						headerParameters.put(parameter[0], parameter[1]);
+						if (parameter[0].equals("Content-Length"))
+							contentLength = Integer.parseInt(parameter[1]);
+						else if (parameter[0].equals("Content-Type") && (!parameter[1].equals("UTF-8")))
+							codificado = true;
 					}
-					content = in.readLine();
-					contentLength = content.length();
-					content = URLDecoder.decode( content, "UTF-8" );
-							
-					parameters = content.split("&");
-					for(String p : parameters){ 
-						parameter = p.split("=");
-						resourceParameters.put(parameter[0], parameter[1]);
+					if (contentLength != -1) {
+						//leer un buffer con tamaño contentLength y asignarlo a Content
+						char[] buffer = new char[contentLength];
+						in.read(buffer, 0, contentLength);
+						content = new String(buffer);
+						//content = in.readLine();
+						//contentLength = content.length();
+						//solo si está codificado con cabecera "Content-Type: application/x-www-form-urlencoded\r\n"
+						if (codificado)
+							content = URLDecoder.decode( content, "UTF-8" );
+
+						parameters = content.split("&");
+						for(String p : parameters){ 
+							parameter = p.split("=");
+							resourceParameters.put(parameter[0], parameter[1]);
+						}	
 					}
 					break;
 				}
