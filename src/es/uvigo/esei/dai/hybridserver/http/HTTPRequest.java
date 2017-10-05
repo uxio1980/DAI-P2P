@@ -73,17 +73,17 @@ public class HTTPRequest {
 						headerParameters.put(parameter[0], parameter[1]);
 						if (parameter[0].equals("Content-Length"))
 							contentLength = Integer.parseInt(parameter[1]);
-						else if (parameter[0].equals("Content-Type") && (!parameter[1].equals("UTF-8")))
+						else if (parameter[0].equals("Content-Type"))
 							codificado = true;
 					}
 					if (contentLength != -1) {
-						//leer un buffer con tamaÒo contentLength y asignarlo a Content
+						//leer un buffer con tama√±o contentLength y asignarlo a Content
 						char[] buffer = new char[contentLength];
 						in.read(buffer, 0, contentLength);
 						content = new String(buffer);
 						//content = in.readLine();
 						//contentLength = content.length();
-						//solo si est· codificado con cabecera "Content-Type: application/x-www-form-urlencoded\r\n"
+						//solo si est√° codificado con cabecera "Content-Type: application/x-www-form-urlencoded\r\n"
 						if (codificado)
 							content = URLDecoder.decode( content, "UTF-8" );
 
