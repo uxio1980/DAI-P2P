@@ -8,5 +8,5 @@ public interface HtmlDAO {
 	// INTERFAZ con get para que Html manager acceda con el mismo get(uuid) al mapa o a BD.
 	
 	public String getHtmlPage(String uuid);
-	public ArrayList<String> getHtmlList();
+	public ArrayList<String> getHtmlList(int service_port);
 }

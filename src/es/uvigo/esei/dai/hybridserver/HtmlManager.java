@@ -22,8 +22,8 @@ public class HtmlManager {
 		return this.htmlDao.getHtmlPage(uuid);
 	}
 	
-	public ArrayList<String> getHtmlList() {
-		return new ArrayList<String>(this.htmlDao.getHtmlList());
+	public ArrayList<String> getHtmlList(int service_port) {
+		return new ArrayList<String>(this.htmlDao.getHtmlList(service_port));
 	}
 
 }

@@ -42,13 +42,15 @@ public class HtmlDAOMap implements HtmlDAO {
 	}
 
 	@Override
-	public ArrayList<String> getHtmlList() {
+	public ArrayList<String> getHtmlList(int service_port) {
 		ArrayList <String> toret = new ArrayList<String>();
 		Iterator<String> iterator = new ArrayList<String>(pages.keySet()).iterator();
 		while (iterator.hasNext()) {
 			String uuid = iterator.next();
-			toret.add("<a href=&quot;localhost:8888/html?uuid=" + uuid + "&quot;>" + uuid + "</a><br />");
+			toret.add("<a href='localhost:" + service_port + "/html?uuid=" + uuid + "' target='_blank'>" + uuid + "</a><br />");
+
 		}
+		System.out.println(toret);
 		return toret;
 	}
 

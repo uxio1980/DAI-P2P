@@ -41,7 +41,7 @@ public class ClientService implements Runnable {
 				if (request.getResourceName().equals("html")) {
 					//recorrer lista
 					StringBuilder sb = new StringBuilder();
-					Iterator<String> iterator = new ArrayList<String>(htmlManager.getHtmlList()).iterator();
+					Iterator<String> iterator = (htmlManager.getHtmlList(socket.getLocalPort())).iterator();
 					while (iterator.hasNext()) {
 						sb.append(iterator.next());
 					}
