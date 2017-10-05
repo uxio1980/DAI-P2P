@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 
 import es.uvigo.esei.dai.hybridserver.http.HTTPHeaders;
@@ -35,13 +37,27 @@ public class ClientService implements Runnable {
 			HTTPResponse response = new HTTPResponse();
 			response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
 			response.setStatus(HTTPResponseStatus.S200);
-			if(uuid == null)
-				response.setContent("Hybrid Server " + Thread.currentThread().getName()+ "\n");
+			if(uuid == null) {
+				if (request.getResourceName().equals("html")) {
+					//recorrer lista
+					StringBuilder sb = new StringBuilder();
+					Iterator<String> iterator = new ArrayList<String>(htmlManager.getHtmlList()).iterator();
+					while (iterator.hasNext()) {
+						sb.append(iterator.next());
+					}
+					response.setContent(sb.toString());
+				}else {
+					response.setContent("Hybrid Server " + Thread.currentThread().getName()+ "\n");		
+				}
+			}
 			else {
 				String content = htmlManager.get(uuid);	
-				response.setContent(content);
+				if (content == null) {
+					response.setStatus(HTTPResponseStatus.S404);
+					response.setContent("Page not Found.");
+				} else
+					response.setContent(content);
 			}
-
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 			out.println(response);
 			//socket.getOutputStream();
@@ -49,6 +65,6 @@ public class ClientService implements Runnable {
 		} catch (IOException | HTTPParseException e) {
 			System.out.println("\t>> Error en Thread Client:\n" + e.getMessage());
 		} 
-		System.out.println(">> ClientService " + Thread.currentThread().getName() + " sirvió la página...");
+		//System.out.println(">> ClientService " + Thread.currentThread().getName() + " sirvió la página...");
 	}
 }

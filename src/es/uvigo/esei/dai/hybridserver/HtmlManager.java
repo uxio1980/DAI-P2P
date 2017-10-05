@@ -1,5 +1,6 @@
 package es.uvigo.esei.dai.hybridserver;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,4 +21,9 @@ public class HtmlManager {
 	public String get(String uuid) { 
 		return this.htmlDao.getHtmlPage(uuid);
 	}
+	
+	public ArrayList<String> getHtmlList() {
+		return new ArrayList<String>(this.htmlDao.getHtmlList());
+	}
+
 }

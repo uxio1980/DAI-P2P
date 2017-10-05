@@ -1,6 +1,8 @@
 package es.uvigo.esei.dai.hybridserver;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class HtmlDAOMap implements HtmlDAO {
@@ -39,10 +41,15 @@ public class HtmlDAOMap implements HtmlDAO {
 		return pages.get(uuid);
 	}
 
-	/*@Override
-	public Map<String, String> getHtmlList() {
-		// TODO Auto-generated method stub
-		return null;
-	}*/
+	@Override
+	public ArrayList<String> getHtmlList() {
+		ArrayList <String> toret = new ArrayList<String>();
+		Iterator<String> iterator = new ArrayList<String>(pages.keySet()).iterator();
+		while (iterator.hasNext()) {
+			String uuid = iterator.next();
+			toret.add("<a href=&quot;localhost:8888/html?uuid=" + uuid + "&quot;>" + uuid + "</a><br />");
+		}
+		return toret;
+	}
 
 }
