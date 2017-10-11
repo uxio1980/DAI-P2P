@@ -9,4 +9,6 @@ public interface HtmlDAO {
 	
 	public String getHtmlPage(String uuid);
 	public ArrayList<String> getHtmlList(int service_port);
+	public void createHtmlPage(String uuid, String content);
+	public void deleteHtmlPage(String uuid);
 }

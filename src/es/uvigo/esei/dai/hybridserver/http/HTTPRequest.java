@@ -32,8 +32,8 @@ public class HTTPRequest {
 			resourceChain = request[1];
 			httpVersion = request[2];
 			
-			switch(method.toString()){
-				case "GET": {
+			switch(method){
+				case GET: case DELETE: {
 					if(request[1].contains("?")){
 						resourceName = request[1].substring(
 							1, request[1].indexOf("?")
@@ -61,11 +61,10 @@ public class HTTPRequest {
 					}
 					break;
 				}
-				case "POST": {
+				case POST: {
 					resourceName = request[1].substring(1);
 					if(!request[1].equals("/"))
 						resourcePath = request[1].substring(1).split("/");
-	
 					contentLength = -1;
 					Boolean codificado = false;
 					while(!(line = in.readLine()).equals("")){
@@ -93,7 +92,7 @@ public class HTTPRequest {
 							resourceParameters.put(parameter[0], parameter[1]);
 						}	
 					}
-					break;
+					break;	
 				}
 			}
 		} catch(Exception e) {

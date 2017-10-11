@@ -33,7 +33,10 @@ public class HtmlDAOMap implements HtmlDAO {
 		}
 		
 	}
-
+	
+	public HtmlDAOMap(Map<String, String>  pages) {
+		this.pages = pages;
+	}
 
 
 	@Override
@@ -54,4 +57,14 @@ public class HtmlDAOMap implements HtmlDAO {
 		return toret;
 	}
 
+	@Override
+	public void createHtmlPage(String uuid, String content) {
+		this.pages.put(uuid, content);
+	}
+	
+	@Override
+	public void deleteHtmlPage(String uuid) {
+		this.pages.remove(uuid);
+		
+	}
 }

@@ -26,4 +26,12 @@ public class HtmlManager {
 		return new ArrayList<String>(this.htmlDao.getHtmlList(service_port));
 	}
 
+	public void create(String uuid, String content){
+		this.htmlDao.createHtmlPage(uuid, content);
+	}
+	
+	public void delete(String uuid) {
+		this.htmlDao.deleteHtmlPage(uuid);
+	}
+	
 }

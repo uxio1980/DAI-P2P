@@ -29,7 +29,7 @@ public class HybridServer {
 
 	public HybridServer(Map<String, String> pages) {
 		// TODO Mapa con <UID, contenido(para poost)> Lo hace el test
-		
+		this.htmlDao = new HtmlDAOMap(pages);
 	}
 
 	public HybridServer(Properties properties) {
