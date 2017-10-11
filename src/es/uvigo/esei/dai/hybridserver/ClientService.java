@@ -57,31 +57,39 @@ public class ClientService implements Runnable {
 					}
 				}
 				else {
-					String content = htmlManager.get(uuid);
-					if (content == null) {
-						response.setStatus(HTTPResponseStatus.S404);
-						response.setContent("Page not Found.");
-					} else
-						response.setContent(content);
+					if(!request.getResourceName().equals("html")) {
+						response.setStatus(HTTPResponseStatus.S400);
+						response.setContent("Bad Request.");
+					}else {
+						String content = htmlManager.get(uuid);
+						if (content == null) {
+							response.setStatus(HTTPResponseStatus.S404);
+							response.setContent("Page not Found.");
+						} else
+							response.setContent(content);						
+					}
 				}
 				out = new PrintWriter(socket.getOutputStream(), true);
 				out.println(response);
-				//socket.getOutputStream();
-				//socket.getOutputStream().flush();
 				break;
 			case POST:
 				params = request.getResourceParameters();
 				UUID randomUuid = UUID.randomUUID();
 				uuid = randomUuid.toString();
 				//response.setContent(socket.getInetAddress().toString()+html);
-				htmlManager.create(uuid, params.get("html"));
+				//System.out.println(">> " + request);
 				response = new HTTPResponse();
-				response.setStatus(HTTPResponseStatus.S200);
-				response.setContent("<a href=\"html?uuid=" + uuid + "\">" + uuid + "</a>");
-				
-				System.out.println(">> " + response.getContent());
-				//response.setContent("localhost/html?uuid="+stringUuid);
 				response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
+				if (!params.keySet().toArray()[0].equals("html")) {
+					response.setStatus(HTTPResponseStatus.S400);
+					response.setContent("Invalid content");
+				}
+				else {
+					htmlManager.create(uuid, params.get("html"));
+					response.setStatus(HTTPResponseStatus.S200);
+					response.setContent("<a href=\"html?uuid=" + uuid + "\">" + uuid + "</a>");
+					//response.setContent("localhost/html?uuid="+stringUuid);
+				}
 				out = new PrintWriter(socket.getOutputStream(), true);
 				out.println(response);
 				break;

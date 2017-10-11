@@ -18,7 +18,7 @@ public class HtmlManager {
 	}
 	
 	// get(UUID) y list
-	public String get(String uuid) { 
+	public String get(String uuid) {
 		return this.htmlDao.getHtmlPage(uuid);
 	}
 	
