@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -73,19 +74,31 @@ public class ClientService implements Runnable {
 				out.println(response);
 				break;
 			case POST:
-				params = request.getResourceParameters();
+				params = request.getResourceParameters();			
 				UUID randomUuid = UUID.randomUUID();
 				uuid = randomUuid.toString();
 				//response.setContent(socket.getInetAddress().toString()+html);
-				//System.out.println(">> " + request);
+
 				response = new HTTPResponse();
 				response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
 				if (!params.keySet().toArray()[0].equals("html")) {
+				//if (!content.split("=")[0].equals("html")) {
 					response.setStatus(HTTPResponseStatus.S400);
 					response.setContent("Invalid content");
 				}
 				else {
-					htmlManager.create(uuid, params.get("html"));
+					String type = request.getHeaderParameters().get("Content-Type");
+					String content="";
+					/*
+					 * Cuando la petición HTTP contenga la cabecera Content-Type: application/x-www-form-urlencoded.
+					 * el contenido deberá ser decodificado:
+					 */
+					if (type != null && type.startsWith("application/x-www-form-urlencoded")) {
+						System.out.println(">> "+ params.get("html")) ;
+						content = URLDecoder.decode(params.get("html"), "UTF-8");
+					}else
+						content = params.get("html");
+					htmlManager.create(uuid, content);
 					response.setStatus(HTTPResponseStatus.S200);
 					response.setContent("<a href=\"html?uuid=" + uuid + "\">" + uuid + "</a>");
 					//response.setContent("localhost/html?uuid="+stringUuid);
