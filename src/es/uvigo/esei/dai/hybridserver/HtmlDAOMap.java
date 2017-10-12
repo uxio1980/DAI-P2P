@@ -9,12 +9,13 @@ public class HtmlDAOMap implements HtmlDAO {
 
 	private final Map<String, String>  pages;
 	
+	/**
+	 * Constructor que crea un mapa con webs de ejemplo.
+	 */
 	public HtmlDAOMap() {
 		this.pages = new HashMap<>();
 		
-		// El servidor debe tener las siguientes páginas en memoria
 		String[][] pages = new String[][] {
-		//  { "uuid",                                 "texto contenido por la página"                               }
 		    { "6df1047e-cf19-4a83-8cf3-38f5e53f7725", "This is the html page 6df1047e-cf19-4a83-8cf3-38f5e53f7725." },
 		    { "79e01232-5ea4-41c8-9331-1c1880a1d3c2", "This is the html page 79e01232-5ea4-41c8-9331-1c1880a1d3c2." },
 		    { "a35b6c5e-22d6-4707-98b4-462482e26c9e", "This is the html page a35b6c5e-22d6-4707-98b4-462482e26c9e." },
@@ -27,17 +28,19 @@ public class HtmlDAOMap implements HtmlDAO {
 		    { "fa0979ca-2734-41f7-84c5-e40e0886e408", "This is the html page fa0979ca-2734-41f7-84c5-e40e0886e408." }
 		};
 		
-		// Creación del servidor con las páginas ya en memoria.
 		for (String[] page : pages) {
 			this.pages.put(page[0], page[1]);
 		}
 		
 	}
 	
+	/**
+	 * Constructor que recibe un mapa con webs.
+	 * @param pages Mapa de páginas web <uuid,contenido>.
+	 */
 	public HtmlDAOMap(Map<String, String>  pages) {
 		this.pages = pages;
 	}
-
 
 	@Override
 	public String getHtmlPage(String uuid) {
@@ -45,16 +48,15 @@ public class HtmlDAOMap implements HtmlDAO {
 	}
 
 	@Override
-	public ArrayList<String> getHtmlList(int service_port) {
-		ArrayList <String> toret = new ArrayList<String>();
+	public String getHtmlList(int service_port) {
+		StringBuilder sb = new StringBuilder();	
 		Iterator<String> iterator = new ArrayList<String>(pages.keySet()).iterator();
+		
 		while (iterator.hasNext()) {
 			String uuid = iterator.next();
-			toret.add("<a href='localhost:" + service_port + "/html?uuid=" + uuid + "' target='_blank'>" + uuid + "</a><br />");
-
+			sb.append("<a href='localhost:"+ service_port +"/html?uuid="+ uuid +"' target='_blank'>"+ uuid +"</a><br />");
 		}
-		System.out.println(toret);
-		return toret;
+		return sb.toString();
 	}
 
 	@Override
@@ -66,5 +68,10 @@ public class HtmlDAOMap implements HtmlDAO {
 	public void deleteHtmlPage(String uuid) {
 		this.pages.remove(uuid);
 		
+	}
+	
+	@Override
+	public boolean containsPage(String uuid){
+		return pages.containsKey(uuid);
 	}
 }

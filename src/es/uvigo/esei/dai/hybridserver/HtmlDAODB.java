@@ -1,15 +1,41 @@
 package es.uvigo.esei.dai.hybridserver;
 
-import java.util.Map;
-
-public class HtmlDAODB {
+public class HtmlDAODB implements HtmlDAO {
 
 	/**
-	 * @param args
+	 * Constructor que crea una conexión con la base de datos.
 	 */
-	public static void main(String[] args) {
-		// Accede a BD
+	public HtmlDAODB(){
+		
+	}
 
+	@Override
+	public String getHtmlPage(String uuid) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getHtmlList(int service_port) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void createHtmlPage(String uuid, String content) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteHtmlPage(String uuid) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public boolean containsPage(String uuid) {
+		return false;
 	}
 
 }

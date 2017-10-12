@@ -80,8 +80,6 @@ public class HTTPRequest {
 						char[] buffer = new char[contentLength];
 						in.read(buffer, 0, contentLength);
 						content = new String(buffer);
-						//content = in.readLine();
-						//contentLength = content.length();
 						//solo si está codificado con cabecera "Content-Type: application/x-www-form-urlencoded\r\n"
 						if (codificado)
 							content = URLDecoder.decode( content, "UTF-8" );

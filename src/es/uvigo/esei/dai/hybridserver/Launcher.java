@@ -4,8 +4,13 @@ public class Launcher {
 	
 	public static void main(String[] args) {
 
-		//Instanciación de las Implementaciones
+		// Implementación para el Map.
 		HtmlDAO htmlDao = new HtmlDAOMap();
+		
+		// Implementación para la BD.
+		
+		
+		// Se inicia el servidor.
 		HybridServer server = new HybridServer();
 		server.setHtmlDao(htmlDao);
 		server.start();
