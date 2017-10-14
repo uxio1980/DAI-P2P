@@ -4,26 +4,23 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.sql.Connection;
 
+import es.uvigo.esei.dai.jdbc.connection.ConnectionConfiguration;
 import es.uvigo.esei.dai.jdbc.connection.ConnectionUtils;
 import es.uvigo.esei.dai.jdbc.connection.MySQLConnectionConfiguration;
 
 public class HtmlDAODB implements HtmlDAO {
 
-	private static String urlDb;
-	private static String nameDb;
-	private static int portDb;
-	private static String userDb;
-	private static String passwordDb;
+	private Properties dataConfig;
 	private static Connection connection;
 	
 	/**
 	 * Constructor que crea una conexión con la base de datos.
 	 */
-	public HtmlDAODB(Properties dataCongig){
+	public HtmlDAODB(Properties dataCongig, ConnectionConfiguration connectionConfiguration){
 		
-		setProperties(dataCongig);
+		this.dataConfig = dataConfig;
 		try {
-			connection = ConnectionUtils.getConnection(new MySQLConnectionConfiguration(userDb,passwordDb,urlDb,nameDb,portDb));
+			connection = ConnectionUtils.getConnection(connectionConfiguration);
 		} catch (IllegalArgumentException | SQLException e) {
 			//e.printStackTrace();
 			System.out.println("Error:\n\t" + e.getMessage());
@@ -59,24 +56,6 @@ public class HtmlDAODB implements HtmlDAO {
 		return false;
 	}
 
-	private void setProperties(Properties properties) {
-		Properties dataConfig= null; 
-		if (properties!=null)
-			dataConfig = properties;
-		else {
-			dataConfig = new Properties();
-			System.out.println("Faltan Argumentos.. (Config.conf). Se cargarán los parámetros por defecto.");
-		}
-		//this.service_port = Integer.parseInt(dataConfig.getProperty("port","8888"));	
-		//this.num_clients = Integer.parseInt(dataConfig.getProperty("numClients", "50"));
-		//HtmlDAODB.database = dataConfig.getProperty("db.url", "jdbc:mysql://localhost:3306/hstestdb");
-		HtmlDAODB.userDb = dataConfig.getProperty("db.user", "hsdb");
-		HtmlDAODB.passwordDb = dataConfig.getProperty("db.password", "hsdbpass");
-		String[] url = dataConfig.getProperty("db.url", "jdbc:mysql://localhost:3306/hstestdb").split("/");
-		HtmlDAODB.urlDb = url[2].split(":")[0];
-		HtmlDAODB.portDb = Integer.parseInt(url[2].split(":")[1]);
-		HtmlDAODB.nameDb = url[3];
-	}
 }
 
 
