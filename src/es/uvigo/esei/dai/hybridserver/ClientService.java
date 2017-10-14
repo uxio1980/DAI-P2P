@@ -38,7 +38,7 @@ public class ClientService implements Runnable {
 		ClientService.response = new HTTPResponse();
 		ClientService.htmlManager = new HtmlManager(htmlDao);
 	}
-	
+
 	/**
 	 * Recibe una petición GET y genera una respuesta que puede ser:
 	 * Lista de todas las páginas, una sola página o un error 404.
@@ -47,7 +47,7 @@ public class ClientService implements Runnable {
 	private static void methodGet(HTTPRequest request){
 		params = request.getResourceParameters();
 		uuid = params.get("uuid");
-		
+
 		// Comprueba si se recibe el parámetro uuid.
 		if(uuid == null) {
 			setResponse(HTTPResponseStatus.S200, htmlManager.getHtmlList(port)); // Recupera una lista de páginas.
@@ -61,7 +61,7 @@ public class ClientService implements Runnable {
 				setResponse(HTTPResponseStatus.S404);
 		}
 	}
-	
+
 	/**
 	 * Recibe una petición POST y genera una respuesta positiva o un error 400.
 	 * @param request Petición HTTP.
@@ -70,7 +70,7 @@ public class ClientService implements Runnable {
 		params = request.getResourceParameters();				
 		UUID randomUuid = UUID.randomUUID();
 		uuid = randomUuid.toString();
-		
+
 		// Comprueba si el parámetro del formulario se llama html.
 		if(params.containsKey("html")){
 			htmlManager.create(uuid, params.get("html")); // Crea la página.
@@ -78,7 +78,7 @@ public class ClientService implements Runnable {
 		} else
 			setResponse(HTTPResponseStatus.S400);
 	}
-	
+
 	/**
 	 * Recibe una petición DELETE y genera una respuesta positiva o un error 404.
 	 * @param request Petición HTTP.
@@ -94,7 +94,7 @@ public class ClientService implements Runnable {
 		} else
 			setResponse(HTTPResponseStatus.S404);
 	}
-	
+
 	/**
 	 * Genera una respuesta HTTP.
 	 * @param Status Status HTTP de la respuesta.
@@ -105,7 +105,7 @@ public class ClientService implements Runnable {
 		response.setStatus(status);
 		response.setContent(content);
 	}
-	
+
 	/**
 	 * Genera una respuesta HTTP.
 	 * @param status Status HTTP de la respuesta.
@@ -115,7 +115,7 @@ public class ClientService implements Runnable {
 		response.setStatus(status);
 		response.setContent(status.getStatus());
 	}
-	
+
 	/**
 	 * Devuelve una respuesta HTTP.
 	 * @return Respuesta HTTP
@@ -135,24 +135,24 @@ public class ClientService implements Runnable {
 			System.out.println(request);
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 			String resource = request.getResourceName();
-			
+
 			// Comprueba si el recurso es válido. 
 			// Si está vacío lleva a la página de inicio. Si no existe muestra un error.
 			if(Arrays.asList(RESOURCES).contains(resource)){
 				try{
 					switch (request.getMethod()) {
-						case GET:
-							methodGet(request);
-							break;
-						case POST:
-							methodPost(request);
-							break;
-						case DELETE:
-							methodDelete(request);
-							break;
-						default: break;
+					case GET:
+						methodGet(request);
+						break;
+					case POST:
+						methodPost(request);
+						break;
+					case DELETE:
+						methodDelete(request);
+						break;
+					default: break;
 					}
-				// Si se produce un error no experado en la BD lanza un error 500.
+					// Si se produce un error no experado en la BD lanza un error 500.
 				} catch(Exception e) {
 					setResponse(HTTPResponseStatus.S500);
 					out.println(getResponse());
@@ -163,10 +163,10 @@ public class ClientService implements Runnable {
 						"Hybrid Server\n\n Iago Fernández González\n Jose Eugenio González Fernández");	
 			else
 				setResponse(HTTPResponseStatus.S400);
-			
+
 			System.out.println(getResponse());
 			out.println(getResponse());
-			
+
 		} catch (IOException | HTTPParseException e) {
 			System.out.println("\t>> Error en Thread Client:\n" + e.getMessage());
 		} 

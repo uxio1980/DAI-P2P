@@ -18,8 +18,12 @@ import es.uvigo.esei.dai.hybridserver.http.HTTPResponse;
 import es.uvigo.esei.dai.hybridserver.http.HTTPResponseStatus;
 
 public class HybridServer {
+	private static int service_port;
+	private static int num_clients;
+	//private static String database;
+	//private static String userDb;
+	//private static String passwordDb;
 	
-	private static final int SERVICE_PORT = 8888;
 	private Thread serverThread;
 	private boolean stop;
 	private HtmlDAO htmlDao;
@@ -27,7 +31,9 @@ public class HybridServer {
 	/**
 	 * Constructor vacío.
 	 */
-	public HybridServer() {}
+	public HybridServer() {
+		this.setProperties(null);
+	}
 
 	/**
 	 * Constructor que recibe un mapa de webs.
@@ -35,6 +41,7 @@ public class HybridServer {
 	 */
 	public HybridServer(Map<String, String> pages) {
 		// TODO Mapa con <UID, contenido(para poost)> Lo hace el test
+		this.setProperties(null);
 		this.htmlDao = new HtmlDAOMap(pages);
 	}
 
@@ -43,7 +50,7 @@ public class HybridServer {
 	 * @param properties Propiedades de configuración de la BD.
 	 */
 	public HybridServer(Properties properties) {
-		// TODO
+		this.setProperties(properties);
 	}
 
 	/**
@@ -51,7 +58,7 @@ public class HybridServer {
 	 * @return Puerto del socket.
 	 */
 	public int getPort() {
-		return SERVICE_PORT;
+		return service_port;
 	}
 	
 	/**
@@ -71,13 +78,13 @@ public class HybridServer {
 			public void run() {
 				System.out.print("Inicializando servidor... ");
 				Socket socket = null;
-				try (final ServerSocket serverSocket = new ServerSocket(SERVICE_PORT)) {
+				try (final ServerSocket serverSocket = new ServerSocket(service_port)) {
 						
 					System.out.println("\t[OK]\nEsperando conexiones entrantes...");
-					ExecutorService executor = Executors.newFixedThreadPool(50);
+					ExecutorService executor = Executors.newFixedThreadPool(num_clients);
 					while (true) {
 						try  {
-							// Acepta clientes y crea un hilo para cada uno hasta un max de 50.
+							// Acepta clientes y crea un hilo para cada uno.
 							socket = serverSocket.accept();
 							if (stop) break;
 							System.out.println("Nueva conexión entrante: "+socket);	
@@ -105,7 +112,7 @@ public class HybridServer {
 	public void stop() {
 		this.stop = true;
 
-		try (Socket socket = new Socket("localhost", SERVICE_PORT)) {
+		try (Socket socket = new Socket("localhost", service_port)) {
 			// Esta conexión se hace, simplemente, para "despertar" al hilo servidor.
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -118,5 +125,20 @@ public class HybridServer {
 		}
 
 		this.serverThread = null;
+	}
+	
+	private void setProperties(Properties properties) {
+		Properties dataConfig= null; 
+		if (properties!=null)
+			dataConfig = properties;
+		else {
+			dataConfig = new Properties();
+			System.out.println("Faltan Argumentos.. (Config.conf). Se cargarán los parámetros por defecto.");
+		}
+		this.service_port = Integer.parseInt(dataConfig.getProperty("port","8888"));	
+		this.num_clients = Integer.parseInt(dataConfig.getProperty("numClients", "50"));
+		//this.database = dataConfig.getProperty("db.url", "jdbc:mysql://localhost:3306/hstestdb");
+		//this.userDb = dataConfig.getProperty("db.user", "hsdb");
+		//this.passwordDb = dataConfig.getProperty("db.password", "hsdbpass");
 	}
 }
