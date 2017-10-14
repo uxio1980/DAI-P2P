@@ -1,9 +1,11 @@
 package es.uvigo.esei.dai.hybridserver;
 
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.sql.Connection;
-
 import es.uvigo.esei.dai.jdbc.connection.ConnectionConfiguration;
 import es.uvigo.esei.dai.jdbc.connection.ConnectionUtils;
 import es.uvigo.esei.dai.jdbc.connection.MySQLConnectionConfiguration;
@@ -22,64 +24,85 @@ public class HtmlDAODB implements HtmlDAO {
 		try {
 			connection = ConnectionUtils.getConnection(connectionConfiguration);
 		} catch (IllegalArgumentException | SQLException e) {
-			//e.printStackTrace();
 			System.out.println("Error:\n\t" + e.getMessage());
 		} 
 	}
 
 	@Override
 	public String getHtmlPage(String uuid) {
-		// TODO Auto-generated method stub
-		return null;
+		try (PreparedStatement statement = connection.prepareStatement(
+				"SELECT * FROM HTML WHERE uuid=?")) {
+			statement.setString(1, uuid);
+			ResultSet result = statement.executeQuery();
+
+			if (result.next()) {
+				return result.getString("content");
+			} else
+				return null;
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public String getHtmlList(int service_port) {
-		// TODO Auto-generated method stub
-		return null;
+		try (PreparedStatement statement = connection.prepareStatement(
+				"SELECT * FROM HTML")) {
+			ResultSet result = statement.executeQuery();
+			StringBuilder sb = new StringBuilder();
+			String uuid;
+
+			while(result.next()) {
+				uuid = result.getString("uuid");
+				sb.append("<a href='localhost:"+ service_port +"/html?uuid="+ uuid +"' target='_blank'>"+ uuid +"</a><br />");
+			}
+			return sb.toString();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void createHtmlPage(String uuid, String content) {
-		// TODO Auto-generated method stub
-		
+		try (PreparedStatement statement = connection.prepareStatement(
+				"INSERT INTO HTML (uuid, content) " + 
+				"VALUES (0, ?, ?)")) {
+			statement.setString(1, uuid);
+			statement.setString(2, content);
+			int rows = statement.executeUpdate();
+			if (rows != 1) {
+				throw new RuntimeException("Error insertando página");
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}	
 	}
 
 	@Override
 	public void deleteHtmlPage(String uuid) {
-		// TODO Auto-generated method stub
-		
+		try (PreparedStatement statement = connection.prepareStatement(
+				"DELETE FROM HTML " + "WHERE uuid=?")) {
+			statement.setString(1, uuid);
+			int rows = statement.executeUpdate();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}	
 	}
 	
 	@Override
 	public boolean containsPage(String uuid) {
-		return false;
+		try (PreparedStatement statement = connection.prepareStatement(
+				"SELECT * FROM HTML WHERE uuid=?")) {
+			statement.setString(1, uuid);
+			ResultSet result = statement.executeQuery();
+
+			if (result.first()) {
+				return true;
+			} else
+				return false;
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }
-
-
-/*
-try (Statement statement = c.createStatement()) {
-
-// 3. EjecuciÃ³n de la consulta 
-//try (ResultSet result = statement.executeQuery(
-//	"SELECT * FROM pages " +
-//	"WHERE nombre LIKE 'A%'"
-try (ResultSet result = statement.executeQuery(
-		"SELECT * FROM pages "
-)) {
-	// 4. VisualizaciÃ³n de los resultados
-	while (result.next()) {
-		System.out.printf("Id: %d, uuid: %s, page: %s\n",
-			result.getInt(1),
-			result.getString(2),
-			result.getString(3)
-		);
-	}
-}
-} catch (SQLException e) {
-// TODO Auto-generated catch block
-e.printStackTrace();
-}
-*/
