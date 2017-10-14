@@ -160,7 +160,11 @@ public class ClientService implements Runnable {
 			}
 			else if(resource.isEmpty())
 				setResponse(HTTPResponseStatus.S200, 
-						"Hybrid Server\n\n Iago Fernández González\n Jose Eugenio González Fernández");	
+						"<html>" +
+						"<head><meta charset='UTF-8'></head> " +
+						"<p><strong>Hybrid Server</strong></p> " +
+						"Iago Fernández González & Jose Eugenio González Fernández" +
+						"</html>");	
 			else
 				setResponse(HTTPResponseStatus.S400);
 
