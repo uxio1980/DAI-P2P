@@ -92,7 +92,7 @@ public class HtmlDAODB implements HtmlDAO {
 	@Override
 	public boolean containsPage(String uuid) {
 		try (PreparedStatement statement = connection.prepareStatement(
-				"SELECT * FROM HTML WHERE uuid=?")) {
+				"SELECT * FROM HTMLrre WHERE uuid=?")) {
 			statement.setString(1, uuid);
 			ResultSet result = statement.executeQuery();
 
