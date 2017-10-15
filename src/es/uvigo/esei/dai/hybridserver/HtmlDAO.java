@@ -1,8 +1,5 @@
 package es.uvigo.esei.dai.hybridserver;
 
-import java.util.ArrayList;
-import java.util.Map;
-
 /**
  * Interfaz que permite al servidor interactuar con la BD o un mapa de webs.
  *

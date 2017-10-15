@@ -92,6 +92,8 @@ public class HTTPRequest {
 					}
 					break;	
 				}
+			default:
+				break;
 			}
 		} catch(Exception e) {
 			throw new HTTPParseException(in.readLine());

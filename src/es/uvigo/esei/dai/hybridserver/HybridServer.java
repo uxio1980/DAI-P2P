@@ -1,28 +1,24 @@
 package es.uvigo.esei.dai.hybridserver;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import es.uvigo.esei.dai.hybridserver.http.HTTPHeaders;
-import es.uvigo.esei.dai.hybridserver.http.HTTPParseException;
-import es.uvigo.esei.dai.hybridserver.http.HTTPRequest;
-import es.uvigo.esei.dai.hybridserver.http.HTTPResponse;
-import es.uvigo.esei.dai.hybridserver.http.HTTPResponseStatus;
+import es.uvigo.esei.dai.jdbc.connection.ConnectionConfiguration;
+import es.uvigo.esei.dai.jdbc.connection.MySQLConnectionConfiguration;
 
 public class HybridServer {
 	private static int service_port;
 	private static int num_clients;
-	//private static String database;
-	//private static String userDb;
-	//private static String passwordDb;
+	private static String urlDb;
+	private static String nameDb;
+	private static int portDb;
+	private static String userDb;
+	private static String passwordDb;
 	
 	private Thread serverThread;
 	private boolean stop;
@@ -42,7 +38,7 @@ public class HybridServer {
 	public HybridServer(Map<String, String> pages) {
 		// TODO Mapa con <UID, contenido(para poost)> Lo hace el test
 		this.setProperties(null);
-		this.htmlDao = new HtmlDAOMap(pages);
+		setHtmlDao(new HtmlDAOMap(pages));
 	}
 
 	/**
@@ -51,6 +47,8 @@ public class HybridServer {
 	 */
 	public HybridServer(Properties properties) {
 		this.setProperties(properties);
+		ConnectionConfiguration connectionConfiguration = new MySQLConnectionConfiguration(userDb,passwordDb,urlDb,nameDb,portDb);
+		setHtmlDao(new HtmlDAODB(connectionConfiguration));
 	}
 
 	/**
@@ -103,7 +101,6 @@ public class HybridServer {
 
 		this.stop = false;
 		this.serverThread.start();
-		//while (this.serverThread.isAlive());
 	}
 
 	/**
@@ -129,16 +126,25 @@ public class HybridServer {
 	
 	private void setProperties(Properties properties) {
 		Properties dataConfig= null; 
-		if (properties!=null)
+		if (properties!=null && !properties.isEmpty())
 			dataConfig = properties;
 		else {
 			dataConfig = new Properties();
-			System.out.println("Faltan Argumentos.. (Config.conf). Se cargarán los parámetros por defecto.");
+			System.out.println(">> Faltan Argumentos.. (Config.conf). Se cargarán los parámetros por defecto.");
 		}
-		this.service_port = Integer.parseInt(dataConfig.getProperty("port","8888"));	
-		this.num_clients = Integer.parseInt(dataConfig.getProperty("numClients", "50"));
-		//this.database = dataConfig.getProperty("db.url", "jdbc:mysql://localhost:3306/hstestdb");
-		//this.userDb = dataConfig.getProperty("db.user", "hsdb");
-		//this.passwordDb = dataConfig.getProperty("db.password", "hsdbpass");
+		service_port = Integer.parseInt(dataConfig.getProperty("port","8888"));	
+		num_clients = Integer.parseInt(dataConfig.getProperty("numClients", "50"));
+		userDb = dataConfig.getProperty("db.user", "hsdb");
+		passwordDb = dataConfig.getProperty("db.password", "hsdbpass");
+		String[] url = dataConfig.getProperty("db.url", "jdbc:mysql://localhost:3306/hstestdb").split("/");
+		nameDb = url[3];
+		urlDb = url[2].split(":")[0];
+		try {
+			portDb = Integer.parseInt(url[2].split(":")[1]);	
+		}catch (Exception e){
+			System.out.println(">> Falta puerto en UrlConnection. Se cargará el puerto por defecto (3306).");
+			portDb = 3306;
+		}
+		
 	}
 }
