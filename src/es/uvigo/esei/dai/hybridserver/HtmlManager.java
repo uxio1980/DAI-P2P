@@ -1,10 +1,7 @@
 package es.uvigo.esei.dai.hybridserver;
 
-import java.util.Map;
-
 public class HtmlManager {
 
-	private Map<String, String> pages;
 	private final HtmlDAO htmlDao;
 
 	/**

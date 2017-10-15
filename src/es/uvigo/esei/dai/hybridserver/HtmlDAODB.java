@@ -1,30 +1,24 @@
 package es.uvigo.esei.dai.hybridserver;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Properties;
 import java.sql.Connection;
 import es.uvigo.esei.dai.jdbc.connection.ConnectionConfiguration;
 import es.uvigo.esei.dai.jdbc.connection.ConnectionUtils;
-import es.uvigo.esei.dai.jdbc.connection.MySQLConnectionConfiguration;
 
 public class HtmlDAODB implements HtmlDAO {
 
-	private Properties dataConfig;
 	private static Connection connection;
 	
 	/**
 	 * Constructor que crea una conexión con la base de datos.
 	 */
-	public HtmlDAODB(Properties dataCongig, ConnectionConfiguration connectionConfiguration){
-		
-		this.dataConfig = dataConfig;
+	public HtmlDAODB(ConnectionConfiguration connectionConfiguration){
 		try {
 			connection = ConnectionUtils.getConnection(connectionConfiguration);
 		} catch (IllegalArgumentException | SQLException e) {
-			System.out.println("Error:\n\t" + e.getMessage());
+			System.out.println("Error en HtmlDaoDB:\n\t" + e.getMessage());
 		} 
 	}
 
@@ -65,7 +59,7 @@ public class HtmlDAODB implements HtmlDAO {
 	@Override
 	public void createHtmlPage(String uuid, String content) {
 		try (PreparedStatement statement = connection.prepareStatement(
-				"INSERT INTO HTML (uuid, content) " + 
+				"INSERT INTO HTML (id,uuid, content) " + 
 				"VALUES (0, ?, ?)")) {
 			statement.setString(1, uuid);
 			statement.setString(2, content);
@@ -83,7 +77,7 @@ public class HtmlDAODB implements HtmlDAO {
 		try (PreparedStatement statement = connection.prepareStatement(
 				"DELETE FROM HTML " + "WHERE uuid=?")) {
 			statement.setString(1, uuid);
-			int rows = statement.executeUpdate();
+			statement.executeUpdate();
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}	
