@@ -1,30 +1,35 @@
 package es.uvigo.esei.dai.hybridserver;
 
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Connection;
-import es.uvigo.esei.dai.jdbc.connection.ConnectionConfiguration;
-import es.uvigo.esei.dai.jdbc.connection.ConnectionUtils;
+import java.util.Properties;
 
 public class HtmlDAODB implements HtmlDAO {
 
-	private static Connection connection;
+	private static String userDb;
+	private static String passwordDb;
+	private static String url;
 	
 	/**
-	 * Constructor que crea una conexión con la base de datos.
+	 * Constructor que almacena los parámetros de la conexión en variables.
 	 */
-	public HtmlDAODB(ConnectionConfiguration connectionConfiguration){
+	public HtmlDAODB(Properties properties){
 		try {
-			connection = ConnectionUtils.getConnection(connectionConfiguration);
-		} catch (IllegalArgumentException | SQLException e) {
+			userDb = properties.getProperty("db.user", "hsdb");
+			passwordDb = properties.getProperty("db.password", "hsdbpass");
+			url = properties.getProperty("db.url", "jdbc:mysql://localhost:3306/hstestdb");
+		} catch (Exception e) {
 			System.out.println("Error en HtmlDaoDB:\n\t" + e.getMessage());
 		} 
 	}
 
 	@Override
 	public String getHtmlPage(String uuid) {
-		try (PreparedStatement statement = connection.prepareStatement(
+		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
+				PreparedStatement statement = connection.prepareStatement(
 				"SELECT * FROM HTML WHERE uuid=?")) {
 			statement.setString(1, uuid);
 			ResultSet result = statement.executeQuery();
@@ -39,8 +44,9 @@ public class HtmlDAODB implements HtmlDAO {
 	}
 
 	@Override
-	public String getHtmlList(int service_port) {
-		try (PreparedStatement statement = connection.prepareStatement(
+	public String getHtmlList() {
+		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
+				PreparedStatement statement = connection.prepareStatement(
 				"SELECT * FROM HTML")) {
 			ResultSet result = statement.executeQuery();
 			StringBuilder sb = new StringBuilder();
@@ -48,7 +54,7 @@ public class HtmlDAODB implements HtmlDAO {
 
 			while(result.next()) {
 				uuid = result.getString("uuid");
-				sb.append("<a href='localhost:"+ service_port +"/html?uuid="+ uuid +"' target='_blank'>"+ uuid +"</a><br />");
+				sb.append("<a href='/html?uuid="+ uuid +"' target='_blank'>"+ uuid +"</a><br />");
 			}
 			return sb.toString();
 		} catch (SQLException e) {
@@ -58,7 +64,8 @@ public class HtmlDAODB implements HtmlDAO {
 
 	@Override
 	public void createHtmlPage(String uuid, String content) {
-		try (PreparedStatement statement = connection.prepareStatement(
+		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
+				PreparedStatement statement = connection.prepareStatement(
 				"INSERT INTO HTML (id,uuid, content) " + 
 				"VALUES (0, ?, ?)")) {
 			statement.setString(1, uuid);
@@ -74,10 +81,14 @@ public class HtmlDAODB implements HtmlDAO {
 
 	@Override
 	public void deleteHtmlPage(String uuid) {
-		try (PreparedStatement statement = connection.prepareStatement(
+		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
+				PreparedStatement statement = connection.prepareStatement(
 				"DELETE FROM HTML " + "WHERE uuid=?")) {
 			statement.setString(1, uuid);
-			statement.executeUpdate();
+			int rows = statement.executeUpdate();
+			if (rows != 1) {
+				throw new RuntimeException("Error insertando página");
+			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}	
@@ -85,8 +96,9 @@ public class HtmlDAODB implements HtmlDAO {
 	
 	@Override
 	public boolean containsPage(String uuid) {
-		try (PreparedStatement statement = connection.prepareStatement(
-				"SELECT * FROM HTMLrre WHERE uuid=?")) {
+		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
+				PreparedStatement statement = connection.prepareStatement(
+				"SELECT * FROM HTML WHERE uuid=?")) {
 			statement.setString(1, uuid);
 			ResultSet result = statement.executeQuery();
 

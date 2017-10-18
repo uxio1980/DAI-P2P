@@ -26,8 +26,8 @@ public class HtmlManager {
 	 * @param service_port Puerto por el que escucha el servidor.
 	 * @return String con una lista de páginas web.
 	 */
-	public String getHtmlList(int service_port) {
-		return this.htmlDao.getHtmlList(service_port);
+	public String getHtmlList() {
+		return this.htmlDao.getHtmlList();
 	}
 
 	/**

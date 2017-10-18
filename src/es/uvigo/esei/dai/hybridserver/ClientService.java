@@ -17,7 +17,6 @@ import es.uvigo.esei.dai.hybridserver.http.HTTPResponseStatus;
 public class ClientService implements Runnable {
 
 	private Socket socket;
-	private static int port;
 	private static HtmlManager htmlManager;
 	private static Map<String,String> params;
 	private static HTTPResponse response;
@@ -31,7 +30,6 @@ public class ClientService implements Runnable {
 	 */
 	public ClientService(Socket socket, HtmlDAO htmlDao) {
 		this.socket = socket;
-		port = socket.getLocalPort();
 		ClientService.response = new HTTPResponse();
 		ClientService.htmlManager = new HtmlManager(htmlDao);
 	}
@@ -47,7 +45,7 @@ public class ClientService implements Runnable {
 
 		// Comprueba si se recibe el parámetro uuid.
 		if(uuid == null) {
-			setResponse(HTTPResponseStatus.S200, htmlManager.getHtmlList(port)); // Recupera una lista de páginas.
+			setResponse(HTTPResponseStatus.S200, htmlManager.getHtmlList()); // Recupera una lista de páginas.
 		}
 		else {
 			// Comprueba si existe la página en el servidor.

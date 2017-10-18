@@ -48,13 +48,13 @@ public class HtmlDAOMap implements HtmlDAO {
 	}
 
 	@Override
-	public String getHtmlList(int service_port) {
+	public String getHtmlList() {
 		StringBuilder sb = new StringBuilder();	
 		Iterator<String> iterator = new ArrayList<String>(pages.keySet()).iterator();
 		
 		while (iterator.hasNext()) {
 			String uuid = iterator.next();
-			sb.append("<a href='localhost:"+ service_port +"/html?uuid="+ uuid +"' target='_blank'>"+ uuid +"</a><br />");
+			sb.append("<a href='/html?uuid="+ uuid +"' target='_blank'>"+ uuid +"</a><br />");
 		}
 		return sb.toString();
 	}

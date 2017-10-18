@@ -9,15 +9,27 @@ public class Launcher {
 
 	public static void main(String[] args) {
 
-		Properties dataConfig = null;
-		if (args.length == 1) 
-			dataConfig = loadParameters(args[0]); 
-	
-		// Se inicia el servidor.
-		HybridServer server = new HybridServer(dataConfig);
-		server.start();
+		// Invoca un contructor distinto en función de si recibe o no parámetro.
+		// Si recibe más de 1 devuelve un error.
+		if (args.length == 0 ){
+			HybridServer server = new HybridServer();
+			server.start();
+		}if (args.length == 1 ){
+			Properties dataConfig = loadParameters(args[0]); 
+
+			// Se inicia el servidor.
+			HybridServer server = new HybridServer(dataConfig);
+			server.start();
+		}
+		else
+			System.out.println("ERROR: demasiados parámetros.");
 	}
 
+	/**
+	 * Recupera el fichero del string recibido por parámetro.
+	 * @param fileName Nombre del fichero.
+	 * @return Objeto Properties con las propiedades del fichero.
+	 */
 	private static Properties loadParameters(String fileName) {
 
 		Properties dataConfig = new Properties();

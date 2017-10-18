@@ -18,7 +18,7 @@ public interface HtmlDAO {
 	 * @param service_port Puerto por el que escucha el servidor.
 	 * @return String con una lista de páginas web.
 	 */
-	public String getHtmlList(int service_port);
+	public String getHtmlList();
 	
 	/**
 	 * Inserta una nueva página web en el servidor.
