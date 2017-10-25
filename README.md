@@ -1,10 +1,7 @@
-# proyecto-dai
+# Primera entrega proyecto DAI
 
-TODO por prioridad:
-- De manera aleatoria el servidor lanza NullPointerException y fallan test.
-- Los links de getHtmlList() no funcionan correctamente.
-- Comprobar todos los casos de error 400, 404 y 500 para asegurarse de que los lanzamos correctamente.
+# Autores
+Grupo 1.1
+Iago Fernández González, 34281271R
+Jose Eugenio González Fernández, 53111974Y
 
-Instrucciones:
-- Ejecutar archivo sql para crear usuario, BD y tabla HTML.
-- Ejecutar Launcher.java.

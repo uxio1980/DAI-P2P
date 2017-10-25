@@ -17,11 +17,11 @@ import es.uvigo.esei.dai.hybridserver.http.HTTPResponseStatus;
 public class ClientService implements Runnable {
 
 	private Socket socket;
-	private static HtmlManager htmlManager;
-	private static Map<String,String> params;
-	private static HTTPResponse response;
-	private static String uuid;
-	private static final String[] RESOURCES = {"html"}; // Faltan xml, xsd y xslt.
+	private HtmlManager htmlManager;
+	private Map<String,String> params;
+	private HTTPResponse response;
+	private String uuid;
+	private final String[] RESOURCES = {"html"}; // Faltan xml, xsd y xslt.
 
 	/**
 	 * Crea un hilo de cliente.
@@ -30,8 +30,8 @@ public class ClientService implements Runnable {
 	 */
 	public ClientService(Socket socket, HtmlDAO htmlDao) {
 		this.socket = socket;
-		ClientService.response = new HTTPResponse();
-		ClientService.htmlManager = new HtmlManager(htmlDao);
+		response = new HTTPResponse();
+		htmlManager = new HtmlManager(htmlDao);
 	}
 
 	/**
@@ -39,7 +39,7 @@ public class ClientService implements Runnable {
 	 * Lista de todas las páginas, una sola página o un error 404.
 	 * @param request Petición HTTP.
 	 */
-	private static void methodGet(HTTPRequest request){
+	private void methodGet(HTTPRequest request){
 		params = request.getResourceParameters();
 		uuid = params.get("uuid");
 
@@ -61,7 +61,7 @@ public class ClientService implements Runnable {
 	 * Recibe una petición POST y genera una respuesta positiva o un error 400.
 	 * @param request Petición HTTP.
 	 */
-	private static void methodPost(HTTPRequest request){	
+	private void methodPost(HTTPRequest request){	
 		params = request.getResourceParameters();				
 		UUID randomUuid = UUID.randomUUID();
 		uuid = randomUuid.toString();
@@ -78,7 +78,7 @@ public class ClientService implements Runnable {
 	 * Recibe una petición DELETE y genera una respuesta positiva o un error 404.
 	 * @param request Petición HTTP.
 	 */
-	private static void methodDelete(HTTPRequest request){
+	private void methodDelete(HTTPRequest request){
 		params = request.getResourceParameters();
 		uuid = params.get("uuid");
 
@@ -95,9 +95,10 @@ public class ClientService implements Runnable {
 	 * @param Status Status HTTP de la respuesta.
 	 * @param content Contenido de la respuesta.
 	 */
-	public static void setResponse(HTTPResponseStatus status, String content){
+	public void setResponse(HTTPResponseStatus status, String content){
 		response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
 		response.setStatus(status);
+		response.putParameter("Content-Type", "text/html");
 		response.setContent(content);
 	}
 
@@ -105,9 +106,10 @@ public class ClientService implements Runnable {
 	 * Genera una respuesta HTTP.
 	 * @param status Status HTTP de la respuesta.
 	 */
-	public static void setResponse(HTTPResponseStatus status){
+	public void setResponse(HTTPResponseStatus status){
 		response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
 		response.setStatus(status);
+		response.putParameter("Content-Type", "text/html");
 		response.setContent(status.getStatus());
 	}
 
@@ -115,7 +117,7 @@ public class ClientService implements Runnable {
 	 * Devuelve una respuesta HTTP.
 	 * @return Respuesta HTTP
 	 */
-	public static HTTPResponse getResponse(){
+	public HTTPResponse getResponse(){
 		return response;
 	}
 

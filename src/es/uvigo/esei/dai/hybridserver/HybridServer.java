@@ -7,13 +7,15 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class HybridServer {
-	private static int service_port;
-	private static int num_clients;
+	private int service_port;
+	private int num_clients;
 	private Thread serverThread;
 	private boolean stop;
 	private HtmlDAO htmlDao;
+	private ExecutorService executor;
 
 	/**
 	 * Constructor vacío.
@@ -70,7 +72,7 @@ public class HybridServer {
 				try (final ServerSocket serverSocket = new ServerSocket(service_port)) {
 						
 					System.out.println("\t[OK]\nEsperando conexiones entrantes...");
-					ExecutorService executor = Executors.newFixedThreadPool(num_clients);
+					 executor = Executors.newFixedThreadPool(num_clients);
 					while (true) {
 						try  {
 							// Acepta clientes y crea un hilo para cada uno.
@@ -83,6 +85,7 @@ public class HybridServer {
 							System.out.println("Error en servidor:\n" + e.getMessage());
 							System.exit(0);
 						}
+						
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -110,6 +113,12 @@ public class HybridServer {
 			this.serverThread.join();
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
+		}
+		executor.shutdownNow();
+		try {
+			executor.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 
 		this.serverThread = null;

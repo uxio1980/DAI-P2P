@@ -14,7 +14,7 @@ public class Launcher {
 		if (args.length == 0 ){
 			HybridServer server = new HybridServer();
 			server.start();
-		}if (args.length == 1 ){
+		}else if (args.length == 1 ){
 			Properties dataConfig = loadParameters(args[0]); 
 
 			// Se inicia el servidor.

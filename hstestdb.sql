@@ -31,7 +31,6 @@ GRANT ALL PRIVILEGES ON `hstestdb` . * TO 'hsdb'@'localhost';
 --
 
 CREATE TABLE `HTML` (
-  `id` int(11) NOT NULL,
   `uuid` varchar(40) CHARACTER SET utf8 NOT NULL,
   `content` mediumtext CHARACTER SET utf8 NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -41,16 +40,16 @@ CREATE TABLE `HTML` (
 --
 
 INSERT INTO `HTML` (`id`, `uuid`, `content`) VALUES
-(443, '6df1047e-cf19-4a83-8cf3-38f5e53f7725', '<html><body>This is the html page 6df1047e-cf19-4a83-8cf3-38f5e53f7725.</body></html>'),
-(444, '79e01232-5ea4-41c8-9331-1c1880a1d3c2', '<html><body>This is the html page 79e01232-5ea4-41c8-9331-1c1880a1d3c2.</body></html>'),
-(445, 'a35b6c5e-22d6-4707-98b4-462482e26c9e', '<html><body>This is the html page a35b6c5e-22d6-4707-98b4-462482e26c9e.</body></html>'),
-(446, '3aff2f9c-0c7f-4630-99ad-27a0cf1af137', '<html><body>This is the html page 3aff2f9c-0c7f-4630-99ad-27a0cf1af137.</body></html>'),
-(447, '77ec1d68-84e1-40f4-be8e-066e02f4e373', '<html><body>This is the html page 77ec1d68-84e1-40f4-be8e-066e02f4e373.</body></html>'),
-(448, '8f824126-0bd1-4074-b88e-c0b59d3e67a3', '<html><body>This is the html page 8f824126-0bd1-4074-b88e-c0b59d3e67a3.</body></html>'),
-(449, 'c6c80c75-b335-4f68-b7a7-59434413ce6c', '<html><body>This is the html page c6c80c75-b335-4f68-b7a7-59434413ce6c.</body></html>'),
-(450, 'f959ecb3-6382-4ae5-9325-8fcbc068e446', '<html><body>This is the html page f959ecb3-6382-4ae5-9325-8fcbc068e446.</body></html>'),
-(451, '2471caa8-e8df-44d6-94f2-7752a74f6819', '<html><body>This is the html page 2471caa8-e8df-44d6-94f2-7752a74f6819.</body></html>'),
-(452, 'fa0979ca-2734-41f7-84c5-e40e0886e408', '<html><body>This is the html page fa0979ca-2734-41f7-84c5-e40e0886e408.</body></html>');
+('6df1047e-cf19-4a83-8cf3-38f5e53f7725', '<html><body>This is the html page 6df1047e-cf19-4a83-8cf3-38f5e53f7725.</body></html>'),
+('79e01232-5ea4-41c8-9331-1c1880a1d3c2', '<html><body>This is the html page 79e01232-5ea4-41c8-9331-1c1880a1d3c2.</body></html>'),
+('a35b6c5e-22d6-4707-98b4-462482e26c9e', '<html><body>This is the html page a35b6c5e-22d6-4707-98b4-462482e26c9e.</body></html>'),
+('3aff2f9c-0c7f-4630-99ad-27a0cf1af137', '<html><body>This is the html page 3aff2f9c-0c7f-4630-99ad-27a0cf1af137.</body></html>'),
+('77ec1d68-84e1-40f4-be8e-066e02f4e373', '<html><body>This is the html page 77ec1d68-84e1-40f4-be8e-066e02f4e373.</body></html>'),
+('8f824126-0bd1-4074-b88e-c0b59d3e67a3', '<html><body>This is the html page 8f824126-0bd1-4074-b88e-c0b59d3e67a3.</body></html>'),
+('c6c80c75-b335-4f68-b7a7-59434413ce6c', '<html><body>This is the html page c6c80c75-b335-4f68-b7a7-59434413ce6c.</body></html>'),
+('f959ecb3-6382-4ae5-9325-8fcbc068e446', '<html><body>This is the html page f959ecb3-6382-4ae5-9325-8fcbc068e446.</body></html>'),
+('2471caa8-e8df-44d6-94f2-7752a74f6819', '<html><body>This is the html page 2471caa8-e8df-44d6-94f2-7752a74f6819.</body></html>'),
+('fa0979ca-2734-41f7-84c5-e40e0886e408', '<html><body>This is the html page fa0979ca-2734-41f7-84c5-e40e0886e408.</body></html>');
 
 --
 -- Índices para tablas volcadas

@@ -66,8 +66,8 @@ public class HtmlDAODB implements HtmlDAO {
 	public void createHtmlPage(String uuid, String content) {
 		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
 				PreparedStatement statement = connection.prepareStatement(
-				"INSERT INTO HTML (id,uuid, content) " + 
-				"VALUES (0, ?, ?)")) {
+				"INSERT INTO HTML (uuid, content) " + 
+				"VALUES (?, ?)")) {
 			statement.setString(1, uuid);
 			statement.setString(2, content);
 			int rows = statement.executeUpdate();
