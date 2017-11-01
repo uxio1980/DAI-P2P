@@ -54,7 +54,7 @@ public class HtmlDAODB implements HtmlDAO {
 
 			while(result.next()) {
 				uuid = result.getString("uuid");
-				sb.append("<a href='/html?uuid="+ uuid +"' target='_blank'>"+ uuid +"</a><br />");
+				sb.append("<a href='/html?uuid="+ uuid +"' target='_blank'>"+ uuid +"</a><br/>");
 			}
 			return sb.toString();
 		} catch (SQLException e) {

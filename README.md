@@ -6,10 +6,10 @@ Implementar un sistema P2P.
 ## DONE
 
 - Tests semana 7 HTML.
+- Tests semana 7 XML.
 
 ## TODO
 
-- Tests semana 7 XML.
 - Tests semana 7 XSD.
 - Tests semana 7 XSLC.
 - Tests semana 9 (XML convert).
