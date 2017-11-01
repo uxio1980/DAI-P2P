@@ -2,18 +2,18 @@ package es.uvigo.esei.dai.hybridserver;
 
 import java.util.Map;
 import java.util.UUID;
-import es.uvigo.esei.dai.hybridserver.http.HTTPHeaders;
 import es.uvigo.esei.dai.hybridserver.http.HTTPRequest;
-import es.uvigo.esei.dai.hybridserver.http.HTTPResponse;
 import es.uvigo.esei.dai.hybridserver.http.HTTPResponseStatus;
 import es.uvigo.esei.dai.hybridserver.http.MIME;
 
 public class XmlManager {
 
 	private final XmlDAO xmlDao;
-	private HTTPResponse response;
 	private Map<String,String> params;
 	private String uuid;
+	private HTTPResponseStatus status;
+	private String content;
+	private String type;
 
 	/**
 	 * Constructor que recibe una instancia de la interfaz XmlDAO.
@@ -21,7 +21,6 @@ public class XmlManager {
 	 */
 	public XmlManager(XmlDAO xmlDao) {
 		this.xmlDao = xmlDao;
-		response = new HTTPResponse();
 	}
 	
 	/**
@@ -34,16 +33,21 @@ public class XmlManager {
 		uuid = params.get("uuid");
 
 		// Comprueba si se recibe el parámetro uuid.
-		if(uuid == null) {  // Recupera una lista de páginas.
-			setResponse(HTTPResponseStatus.S200, xmlDao.getXmlList(), MIME.TEXT_HTML.getMime());
+		if(uuid == null) { 
+			status = HTTPResponseStatus.S200;
+			content = xmlDao.getXmlList(); // Recupera una lista de páginas.
+			type = MIME.TEXT_HTML.getMime();
 		}
 		else {
 			// Comprueba si existe la página en el servidor.
 			if (xmlDao.containsPage(uuid)) {
-				String content = xmlDao.getXmlPage(uuid); // Recupera una página.
-				setResponse(HTTPResponseStatus.S200, content, MIME.APPLICATION_XML.getMime());		
-			} else
-				setResponse(HTTPResponseStatus.S404, MIME.APPLICATION_XML.getMime());
+				status = HTTPResponseStatus.S200;
+				content = xmlDao.getXmlPage(uuid);
+				type = MIME.APPLICATION_XML.getMime();
+			} else{
+				status = HTTPResponseStatus.S404;	
+				type = MIME.APPLICATION_XML.getMime();
+			}
 		}
 	}
 
@@ -59,10 +63,13 @@ public class XmlManager {
 		// Comprueba si el parámetro del formulario se llama html.
 		if(params.containsKey("xml")){
 			xmlDao.createXmlPage(uuid, params.get("xml")); // Crea la página.
-			setResponse(HTTPResponseStatus.S200, "<a href=\"xml?uuid="+ uuid +"\">"+ uuid +"</a>", 
-					MIME.APPLICATION_XML.getMime());
-		} else
-			setResponse(HTTPResponseStatus.S400, MIME.APPLICATION_XML.getMime());
+			status = HTTPResponseStatus.S200;
+			content = "<a href=\"xml?uuid="+ uuid +"\">"+ uuid +"</a>";
+			type = MIME.APPLICATION_XML.getMime();
+		} else{
+			status = HTTPResponseStatus.S400;	
+			type = MIME.APPLICATION_XML.getMime();
+		}
 	}
 
 	/**
@@ -76,41 +83,23 @@ public class XmlManager {
 		// Comprueba si existe la página en el servidor.
 		if(xmlDao.containsPage(uuid)){
 			xmlDao.deleteXmlPage(uuid); // Borra la página.
-			setResponse(HTTPResponseStatus.S200, MIME.APPLICATION_XML.getMime());
-		} else
-			setResponse(HTTPResponseStatus.S404, MIME.APPLICATION_XML.getMime());
+			status = HTTPResponseStatus.S200;
+			type = MIME.APPLICATION_XML.getMime();
+		} else{
+			status = HTTPResponseStatus.S404;
+			type = MIME.APPLICATION_XML.getMime();
+		}
 	}
 	
-	/**
-	 * Genera una respuesta HTTP.
-	 * @param Status Status HTTP de la respuesta.
-	 * @param content Contenido de la respuesta.
-	 * @param type Tipo del contenido.
-	 */
-	private void setResponse(HTTPResponseStatus status, String content, String type){
-		response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
-		response.setStatus(status);
-		response.setContent(content);
-		response.putParameter("Content-Type", type);
+	public HTTPResponseStatus getStatus() {
+		return status;
 	}
 
-	/**
-	 * Genera una respuesta HTTP.
-	 * @param status Status HTTP de la respuesta.
-	 * @param type Tipo del contenido.
-	 */
-	private void setResponse(HTTPResponseStatus status, String type){
-		response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
-		response.setStatus(status);
-		response.setContent(status.getStatus());
-		response.putParameter("Content-Type", type);
+	public String getContent() {
+		return content;
 	}
-	
-	/**
-	 * Devuelve una respuesta HTTP.
-	 * @return Respuesta HTTP
-	 */
-	public HTTPResponse getResponse(){
-		return response;
+
+	public String getType() {
+		return type;
 	}
 }

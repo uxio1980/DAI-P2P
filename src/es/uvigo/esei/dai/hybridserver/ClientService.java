@@ -41,20 +41,9 @@ public class ClientService implements Runnable {
 	private void setResponse(HTTPResponseStatus status, String content, String type){
 		response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
 		response.setStatus(status);
-		response.setContent(content);
 		response.putParameter("Content-Type", type);
-	}
-	
-	/**
-	 * Genera una respuesta HTTP.
-	 * @param status Status HTTP de la respuesta.
-	 * @param type Tipo del contenido.
-	 */
-	private void setResponse(HTTPResponseStatus status, String type){
-		response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
-		response.setStatus(status);
-		response.setContent(status.getStatus());
-		response.putParameter("Content-Type", type);
+		if(content != null)
+			response.setContent(content);
 	}
 	
 	/**
@@ -96,38 +85,44 @@ public class ClientService implements Runnable {
 					case GET:
 						if(resource.equals("html")) {
 							htmlManager.methodGet(request);
-							this.response = htmlManager.getResponse();
+							setResponse(htmlManager.getStatus(), 
+									htmlManager.getContent(), htmlManager.getType());
 						}
 						else if(resource.equals("xml")){
 							xmlManager.methodGet(request);
-							this.response = xmlManager.getResponse();
+							setResponse(xmlManager.getStatus(), 
+									xmlManager.getContent(), xmlManager.getType());
 						}
 						break;
 					case POST:
 						if(resource.equals("html")) {
 							htmlManager.methodPost(request);
-							this.response = htmlManager.getResponse();
+							setResponse(htmlManager.getStatus(), 
+									htmlManager.getContent(), htmlManager.getType());
 						}
 						else if(resource.equals("xml")){
 							xmlManager.methodPost(request);
-							this.response = xmlManager.getResponse();
+							setResponse(xmlManager.getStatus(), 
+									xmlManager.getContent(), xmlManager.getType());
 						}
 						break;
 					case DELETE:
 						if(resource.equals("html")) {
 							htmlManager.methodDelete(request);
-							this.response = htmlManager.getResponse();
+							setResponse(htmlManager.getStatus(), 
+									htmlManager.getContent(), htmlManager.getType());
 						}
 						else if(resource.equals("xml")){
 							xmlManager.methodDelete(request);
-							this.response = xmlManager.getResponse();
+							setResponse(xmlManager.getStatus(), 
+									xmlManager.getContent(), xmlManager.getType());
 						}
 						break;
 					default: break;
 					}
 					// Si se produce un error no experado en la BD lanza un error 500.
 				} catch(Exception e) {
-					setResponse(HTTPResponseStatus.S500,resource);
+					setResponse(HTTPResponseStatus.S500, null, resource);
 					out.println(getResponse());
 				}
 			}
