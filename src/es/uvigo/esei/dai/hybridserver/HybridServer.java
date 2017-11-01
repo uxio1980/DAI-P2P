@@ -33,6 +33,13 @@ public class HybridServer {
 	public HybridServer(Map<String, String> pages) {
 		setHtmlDao(new HtmlDAOMap(pages));
 	}
+	
+	/**
+	 * Constructor que recibe un archivo de configuración.
+	 */
+	public HybridServer(Configuration config) {
+		// TODO for XML.
+	}
 
 	/**
 	 * Constructor que recibe propiedades de configuración.

@@ -15,11 +15,6 @@ CREATE USER IF NOT EXISTS 'hsdb'@'localhost'
 CREATE DATABASE IF NOT EXISTS `hstestdb`;
 GRANT ALL PRIVILEGES ON `hstestdb` . * TO 'hsdb'@'localhost';
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
 --
 -- Base de datos: `hstestdb`
 --
@@ -27,19 +22,34 @@ GRANT ALL PRIVILEGES ON `hstestdb` . * TO 'hsdb'@'localhost';
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `HTML`
+-- Estructura de las tablas
 --
 
 CREATE TABLE `HTML` (
-  `uuid` varchar(40) CHARACTER SET utf8 NOT NULL,
+  `uuid` varchar(36) CHARACTER SET utf8 NOT NULL,
   `content` mediumtext CHARACTER SET utf8 NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+CREATE TABLE `XML` (
+  `uuid` varchar(36) CHARACTER SET utf8 NOT NULL,
+  `content` mediumtext CHARACTER SET utf8 NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `XSD` (
+  `uuid` varchar(36) CHARACTER SET utf8 NOT NULL,
+  `content` mediumtext CHARACTER SET utf8 NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `XSLT` (
+  `uuid` varchar(36) CHARACTER SET utf8 NOT NULL,
+  `xsd` varchar(36) CHARACTER SET utf8 NOT NULL,
+  `content` mediumtext CHARACTER SET utf8 NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 --
--- Volcado de datos para la tabla `HTML`
+-- Volcado de datos para las tablas
 --
 
-INSERT INTO `HTML` (`id`, `uuid`, `content`) VALUES
+INSERT INTO `HTML` (`uuid`, `content`) VALUES
 ('6df1047e-cf19-4a83-8cf3-38f5e53f7725', '<html><body>This is the html page 6df1047e-cf19-4a83-8cf3-38f5e53f7725.</body></html>'),
 ('79e01232-5ea4-41c8-9331-1c1880a1d3c2', '<html><body>This is the html page 79e01232-5ea4-41c8-9331-1c1880a1d3c2.</body></html>'),
 ('a35b6c5e-22d6-4707-98b4-462482e26c9e', '<html><body>This is the html page a35b6c5e-22d6-4707-98b4-462482e26c9e.</body></html>'),
@@ -52,24 +62,16 @@ INSERT INTO `HTML` (`id`, `uuid`, `content`) VALUES
 ('fa0979ca-2734-41f7-84c5-e40e0886e408', '<html><body>This is the html page fa0979ca-2734-41f7-84c5-e40e0886e408.</body></html>');
 
 --
--- Índices para tablas volcadas
---
-
---
--- Indices de la tabla `HTML`
+-- Indices de las tablas y autoincrement
 --
 ALTER TABLE `HTML`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`uuid`);
 
---
--- AUTO_INCREMENT de las tablas volcadas
---
+ALTER TABLE `XML`
+  ADD PRIMARY KEY (`uuid`);
 
---
--- AUTO_INCREMENT de la tabla `HTML`
---
-ALTER TABLE `HTML`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=453;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+ALTER TABLE `XSD`
+  ADD PRIMARY KEY (`uuid`);
+
+ALTER TABLE `XSLT`
+  ADD PRIMARY KEY (`uuid`);

@@ -21,7 +21,7 @@ public class ClientService implements Runnable {
 	private Map<String,String> params;
 	private HTTPResponse response;
 	private String uuid;
-	private final String[] RESOURCES = {"html"}; // Faltan xml, xsd y xslt.
+	private final String[] RESOURCES = {"html","xml","xsd","xslt"};
 
 	/**
 	 * Crea un hilo de cliente.
@@ -44,16 +44,16 @@ public class ClientService implements Runnable {
 		uuid = params.get("uuid");
 
 		// Comprueba si se recibe el parámetro uuid.
-		if(uuid == null) {
-			setResponse(HTTPResponseStatus.S200, htmlManager.getHtmlList()); // Recupera una lista de páginas.
+		if(uuid == null) {  // Recupera una lista de páginas.
+			setResponse(HTTPResponseStatus.S200, htmlManager.getHtmlList(), request.getResourceName());
 		}
 		else {
 			// Comprueba si existe la página en el servidor.
 			if (htmlManager.contains(uuid)) {
 				String id = htmlManager.get(uuid); // Recupera una página.
-				setResponse(HTTPResponseStatus.S200, id);		
+				setResponse(HTTPResponseStatus.S200, id, request.getResourceName());		
 			} else
-				setResponse(HTTPResponseStatus.S404);
+				setResponse(HTTPResponseStatus.S404, request.getResourceName());
 		}
 	}
 
@@ -69,9 +69,9 @@ public class ClientService implements Runnable {
 		// Comprueba si el parámetro del formulario se llama html.
 		if(params.containsKey("html")){
 			htmlManager.create(uuid, params.get("html")); // Crea la página.
-			setResponse(HTTPResponseStatus.S200, "<a href=\"html?uuid="+ uuid +"\">"+ uuid +"</a>");
+			setResponse(HTTPResponseStatus.S200, "<a href=\"html?uuid="+ uuid +"\">"+ uuid +"</a>", request.getResourceName());
 		} else
-			setResponse(HTTPResponseStatus.S400);
+			setResponse(HTTPResponseStatus.S400, request.getResourceName());
 	}
 
 	/**
@@ -85,9 +85,9 @@ public class ClientService implements Runnable {
 		// Comprueba si existe la página en el servidor.
 		if(htmlManager.contains(uuid)){
 			htmlManager.delete(uuid); // Borra la página.
-			setResponse(HTTPResponseStatus.S200);
+			setResponse(HTTPResponseStatus.S200, request.getResourceName());
 		} else
-			setResponse(HTTPResponseStatus.S404);
+			setResponse(HTTPResponseStatus.S404, request.getResourceName());
 	}
 
 	/**
@@ -95,29 +95,29 @@ public class ClientService implements Runnable {
 	 * @param Status Status HTTP de la respuesta.
 	 * @param content Contenido de la respuesta.
 	 */
-	public void setResponse(HTTPResponseStatus status, String content){
+	private void setResponse(HTTPResponseStatus status, String content, String type){
 		response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
 		response.setStatus(status);
-		response.putParameter("Content-Type", "text/html");
 		response.setContent(content);
+		response.putParameter("Content-Type", "text/"+type);
 	}
 
 	/**
 	 * Genera una respuesta HTTP.
 	 * @param status Status HTTP de la respuesta.
 	 */
-	public void setResponse(HTTPResponseStatus status){
+	private void setResponse(HTTPResponseStatus status, String type){
 		response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
 		response.setStatus(status);
-		response.putParameter("Content-Type", "text/html");
 		response.setContent(status.getStatus());
+		response.putParameter("Content-Type", "text/"+type);
 	}
 
 	/**
 	 * Devuelve una respuesta HTTP.
 	 * @return Respuesta HTTP
 	 */
-	public HTTPResponse getResponse(){
+	private HTTPResponse getResponse(){
 		return response;
 	}
 
@@ -151,7 +151,7 @@ public class ClientService implements Runnable {
 					}
 					// Si se produce un error no experado en la BD lanza un error 500.
 				} catch(Exception e) {
-					setResponse(HTTPResponseStatus.S500);
+					setResponse(HTTPResponseStatus.S500,resource);
 					out.println(getResponse());
 				}
 			}
@@ -161,9 +161,9 @@ public class ClientService implements Runnable {
 						"<head><meta charset='UTF-8'></head> " +
 						"<p><strong>Hybrid Server</strong></p> " +
 						"Iago Fernández González & Jose Eugenio González Fernández" +
-						"</html>");	
+						"</html>", resource);	
 			else
-				setResponse(HTTPResponseStatus.S400);
+				setResponse(HTTPResponseStatus.S400, resource);
 
 			System.out.println(getResponse());
 			out.println(getResponse());

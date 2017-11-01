@@ -42,7 +42,7 @@ public class HTTPResponse {
 	public void setContent(String content) {
 		this.content = content;
 		putParameter("Content-Length", 
-				Integer.toString(content.length()));
+				Integer.toString(getContent().length()));
 	}
 
 	public Map<String, String> getParameters() {
@@ -80,16 +80,17 @@ public class HTTPResponse {
 		
 		writer.append(getVersion());
 		writer.append(" ");
-		writer.append(getStatus().getCode() +" "+ getStatus().getStatus());
-			
-		if(!getParameters().isEmpty()) {
-			writer.append("\r\n");
-			List<String> params = listParameters();
-			for(String p: params)
-				writer.append(p);
-		}
+		writer.append(getStatus().getCode() +" "+ getStatus().getStatus());	
 		
+		if(!getParameters().isEmpty()) {
+			List<String> params = listParameters();
+			for(String p: params){
+				writer.append("\r\n");
+				writer.append(p);
+			}
+		}
 		writer.append("\r\n\r\n");
+		
 		if(getContent() != null)
 			writer.append(getContent());
 	}
