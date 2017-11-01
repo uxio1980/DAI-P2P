@@ -94,6 +94,7 @@ public class ClientService implements Runnable {
 	 * Genera una respuesta HTTP.
 	 * @param Status Status HTTP de la respuesta.
 	 * @param content Contenido de la respuesta.
+	 * @param type Tipo del contenido.
 	 */
 	private void setResponse(HTTPResponseStatus status, String content, String type){
 		response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
@@ -105,12 +106,23 @@ public class ClientService implements Runnable {
 	/**
 	 * Genera una respuesta HTTP.
 	 * @param status Status HTTP de la respuesta.
+	 * @param type Tipo del contenido.
 	 */
 	private void setResponse(HTTPResponseStatus status, String type){
 		response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
 		response.setStatus(status);
 		response.setContent(status.getStatus());
 		response.putParameter("Content-Type", "text/"+type);
+	}
+	
+	/**
+	 * Genera una respuesta HTTP.
+	 * @param status Status HTTP de la respuesta.
+	 */
+	private void setResponse(HTTPResponseStatus status){
+		response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
+		response.setStatus(status);
+		response.setContent(status.getStatus());
 	}
 
 	/**
@@ -161,9 +173,9 @@ public class ClientService implements Runnable {
 						"<head><meta charset='UTF-8'></head> " +
 						"<p><strong>Hybrid Server</strong></p> " +
 						"Iago Fernández González & Jose Eugenio González Fernández" +
-						"</html>", resource);	
+						"</html>", "html");	
 			else
-				setResponse(HTTPResponseStatus.S400, resource);
+				setResponse(HTTPResponseStatus.S400);
 
 			System.out.println(getResponse());
 			out.println(getResponse());
