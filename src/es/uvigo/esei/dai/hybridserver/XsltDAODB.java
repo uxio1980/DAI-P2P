@@ -71,9 +71,6 @@ public class XsltDAODB implements XsltDAO{
 			statement.setString(1, uuid);
 			statement.setString(2, xsd);
 			statement.setString(3, content);
-			if (!findXsd(xsd)) {
-				throw new RuntimeException("Error insertando página");
-			}
 			int rows = statement.executeUpdate();
 			if (rows != 1) {
 				throw new RuntimeException("Error insertando página");
@@ -81,22 +78,6 @@ public class XsltDAODB implements XsltDAO{
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}	
-	}
-	
-	private boolean findXsd(String xsd) {
-		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
-				PreparedStatement statement = connection.prepareStatement(
-				"SELECT * FROM XSD WHERE uuid=?")) {
-			statement.setString(1, xsd);
-			ResultSet result = statement.executeQuery();
-
-			if (result.next()) {
-				return true;
-			} else
-				return false;
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	@Override
@@ -123,6 +104,23 @@ public class XsltDAODB implements XsltDAO{
 			ResultSet result = statement.executeQuery();
 
 			if (result.first()) {
+				return true;
+			} else
+				return false;
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	@Override
+	public boolean findXsd(String xsd) {
+		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
+				PreparedStatement statement = connection.prepareStatement(
+				"SELECT * FROM XSD WHERE uuid=?")) {
+			statement.setString(1, xsd);
+			ResultSet result = statement.executeQuery();
+
+			if (result.next()) {
 				return true;
 			} else
 				return false;

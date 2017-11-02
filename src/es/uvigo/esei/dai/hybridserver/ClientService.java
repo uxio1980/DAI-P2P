@@ -5,6 +5,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.Properties;
+
 import es.uvigo.esei.dai.hybridserver.http.HTTPHeaders;
 import es.uvigo.esei.dai.hybridserver.http.HTTPParseException;
 import es.uvigo.esei.dai.hybridserver.http.HTTPRequest;
@@ -23,17 +25,17 @@ public class ClientService implements Runnable {
 	private XsltManager xsltManager;
 
 	/**
-	 * Crea un hilo de cliente.
+	 * Crea un hilo de cliente e inicializa los parámetros de conexión con la BD.
 	 * @param socket Socket de conexión con el servidor.
 	 * @param htmlDao Interfaz para interactuar con el servidor.
 	 */
-	public ClientService(Socket socket, HtmlDAO htmlDao, XmlDAO xmlDao, XsdDAO xsdDao, XsltDAO xsltDao) {
+	public ClientService(Socket socket, Properties properties) {
 		this.socket = socket;
 		response = new HTTPResponse();
-		htmlManager = new HtmlManager(htmlDao);
-		xmlManager = new XmlManager(xmlDao);
-		xsdManager = new XsdManager(xsdDao);
-		xsltManager = new XsltManager(xsltDao);
+		htmlManager = new HtmlManager(new HtmlDAODB(properties));
+		xmlManager = new XmlManager(new XmlDAODB(properties));
+		xsdManager = new XsdManager(new XsdDAODB(properties));
+		xsltManager = new XsltManager(new XsltDAODB(properties));
 	}
 	
 	/**
@@ -76,8 +78,8 @@ public class ClientService implements Runnable {
 		try (Socket s = socket){
 			HTTPRequest request = new HTTPRequest(
 					new InputStreamReader(socket.getInputStream()));
-			System.out.println(request);
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+			String method = request.getMethod().toString();
 			String resource = request.getResourceName();
 
 			// Comprueba si el recurso es válido. 
@@ -85,74 +87,47 @@ public class ClientService implements Runnable {
 			if(Arrays.asList(RESOURCES).contains(resource)){
 				try{
 					// En función del método y tipo de recurso llama a un Manager distinto.
-					switch (request.getMethod()) {
-					case GET:
-						if(resource.equals("html")) {
+					switch(resource) {
+					case "html":
+						if(method.equals("GET"))
 							htmlManager.methodGet(request);
-							setResponse(htmlManager.getStatus(), 
-									htmlManager.getContent(), htmlManager.getType());
-						}
-						else if(resource.equals("xml")){
-							xmlManager.methodGet(request);
-							setResponse(xmlManager.getStatus(), 
-									xmlManager.getContent(), xmlManager.getType());
-						}
-						else if(resource.equals("xsd")){
-							xsdManager.methodGet(request);
-							setResponse(xsdManager.getStatus(), 
-									xsdManager.getContent(), xsdManager.getType());
-						}
-						else if(resource.equals("xslt")){
-							xsltManager.methodGet(request);
-							setResponse(xsltManager.getStatus(), 
-									xsltManager.getContent(), xsltManager.getType());
-						}
-						break;
-					case POST:
-						if(resource.equals("html")) {
+						else if(method.equals("POST"))
 							htmlManager.methodPost(request);
-							setResponse(htmlManager.getStatus(), 
-									htmlManager.getContent(), htmlManager.getType());
-						}
-						else if(resource.equals("xml")){
-							xmlManager.methodPost(request);
-							setResponse(xmlManager.getStatus(), 
-									xmlManager.getContent(), xmlManager.getType());
-						}
-						else if(resource.equals("xsd")){
-							xsdManager.methodPost(request);
-							setResponse(xsdManager.getStatus(), 
-									xsdManager.getContent(), xsdManager.getType());
-						}
-						else if(resource.equals("xslt")){
-							xsltManager.methodPost(request);
-							setResponse(xsltManager.getStatus(), 
-									xsltManager.getContent(), xsltManager.getType());
-						}
-						break;
-					case DELETE:
-						if(resource.equals("html")) {
+						else if(method.equals("DELETE"))
 							htmlManager.methodDelete(request);
-							setResponse(htmlManager.getStatus(), 
-									htmlManager.getContent(), htmlManager.getType());
-						}
-						else if(resource.equals("xml")){
-							xmlManager.methodDelete(request);
-							setResponse(xmlManager.getStatus(), 
-									xmlManager.getContent(), xmlManager.getType());
-						}
-						else if(resource.equals("xsd")){
-							xsdManager.methodDelete(request);
-							setResponse(xsdManager.getStatus(), 
-									xsdManager.getContent(), xsdManager.getType());
-						}
-						else if(resource.equals("xslt")){
-							xsltManager.methodDelete(request);
-							setResponse(xsltManager.getStatus(), 
-									xsltManager.getContent(), xsltManager.getType());
-						}
+						setResponse(htmlManager.getStatus(), 
+								htmlManager.getContent(), htmlManager.getType());
 						break;
-					default: break;
+					case "xml":
+						if(method.equals("GET"))
+							xmlManager.methodGet(request);
+						else if(method.equals("POST"))
+							xmlManager.methodPost(request);
+						else if(method.equals("DELETE"))
+							xmlManager.methodDelete(request);
+						setResponse(xmlManager.getStatus(), 
+								xmlManager.getContent(), xmlManager.getType());
+						break;
+					case "xsd":
+						if(method.equals("GET"))
+							xsdManager.methodGet(request);
+						else if(method.equals("POST"))
+							xsdManager.methodPost(request);
+						else if(method.equals("DELETE"))
+							xsdManager.methodDelete(request);
+						setResponse(xsdManager.getStatus(), 
+								xsdManager.getContent(), xsdManager.getType());
+						break;
+					case "xslt":
+						if(method.equals("GET"))
+							xsltManager.methodGet(request);
+						else if(method.equals("POST"))
+							xsltManager.methodPost(request);
+						else if(method.equals("DELETE"))
+							xsltManager.methodDelete(request);
+						setResponse(xsltManager.getStatus(), 
+								xsltManager.getContent(), xsltManager.getType());
+						break;
 					}
 					// Si se produce un error no experado en la BD lanza un error 500.
 				} catch(Exception e) {
@@ -169,11 +144,11 @@ public class ClientService implements Runnable {
 						"</html>", MIME.TEXT_HTML.getMime());	
 			else
 				setResponse(HTTPResponseStatus.S400);
-
-			System.out.println(getResponse());
 			out.println(getResponse());
-
-		} catch (IOException | HTTPParseException e) {
+			System.out.println(request);
+			System.out.println(getResponse()+"\n");
+		} 
+		catch (IOException | HTTPParseException e) {
 			System.out.println("\t>> Error en Thread Client:\n" + e.getMessage());
 		} 
 	}

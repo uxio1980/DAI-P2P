@@ -34,4 +34,11 @@ public interface XsltDAO {
 	 * @param uuid Identificador de la página web.
 	 */
 	public boolean containsPage(String uuid);
+	
+	/**
+	 * Comprueba si el ficero XSD existe en el servidor.
+	 * @param xsd Identidicador del XSD.
+	 * @return True si el fichero XSD existe en el servidor.
+	 */
+	public boolean findXsd(String xsd);
 }

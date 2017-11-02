@@ -64,9 +64,9 @@ public class XsltManager {
 		uuid = randomUuid.toString();	
 		type = MIME.APPLICATION_XML.getMime();
 
-		// Comprueba si el parámetro del formulario se llama html.
+		// Comprueba si los parámetros del formulario se llaman xslt y xsd.
 		if(params.containsKey("xslt") && params.containsKey("xsd")){
-			if (!validateUUID(params.get("xsd"))) 
+			if (!XsltDao.findXsd(params.get("xsd"))) 
 				status = HTTPResponseStatus.S404;
 			else {
 				XsltDao.createXsltPage(uuid, params.get("xsd"), params.get("xslt")); // Crea la página.
@@ -76,14 +76,6 @@ public class XsltManager {
 		} else{
 			status = HTTPResponseStatus.S400;	
 		}
-	}
-
-	private boolean validateUUID(String uuid) {
-		//8-4-4-4-12
-		 Pattern pat = Pattern.compile("[a-z0-9]{8}(-[a-z0-9]{4}){3}-[a-z0-9]{12}");
-	     Matcher mat = pat.matcher(uuid);
-	     System.out.println(">>> " + uuid);
-		return mat.matches();
 	}
 	
 	/**

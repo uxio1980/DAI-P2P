@@ -60,7 +60,7 @@ public class XsdManager {
 		UUID randomUuid = UUID.randomUUID();
 		uuid = randomUuid.toString();
 
-		// Comprueba si el parámetro del formulario se llama html.
+		// Comprueba si el parámetro del formulario se llama xsd.
 		if(params.containsKey("xsd")){
 			XsdDao.createXsdPage(uuid, params.get("xsd")); // Crea la página.
 			status = HTTPResponseStatus.S200;

@@ -60,7 +60,7 @@ public class XmlManager {
 		UUID randomUuid = UUID.randomUUID();
 		uuid = randomUuid.toString();
 
-		// Comprueba si el parámetro del formulario se llama html.
+		// Comprueba si el parámetro del formulario se llama xml.
 		if(params.containsKey("xml")){
 			xmlDao.createXmlPage(uuid, params.get("xml")); // Crea la página.
 			status = HTTPResponseStatus.S200;

@@ -15,10 +15,7 @@ public class HybridServer {
 	private Thread serverThread;
 	private boolean stop;
 	private ExecutorService executor;
-	private HtmlDAO htmlDao;
-	private XmlDAO xmlDao;
-	private XsdDAO xsdDao;
-	private XsltDAO xsltDao;
+	private Properties properties;
 
 	/**
 	 * Constructor vacío.
@@ -26,7 +23,7 @@ public class HybridServer {
 	public HybridServer() {
 		service_port = 8888;	
 		num_clients = 50;
-		setDAO(new Properties());
+		properties = new Properties();
 	}
 	
 	/**
@@ -43,7 +40,7 @@ public class HybridServer {
 	public HybridServer(Properties properties) {
 		service_port = Integer.parseInt(properties.getProperty("port","8888"));	
 		num_clients = Integer.parseInt(properties.getProperty("numClients", "50"));
-		setDAO(properties);
+		this.properties = properties;
 	}
 	
 	/**
@@ -51,18 +48,7 @@ public class HybridServer {
 	 * @param pages Mapa de páginas web <uuid,contenido>.
 	 */
 	public HybridServer(Map<String, String> pages) {
-		this.htmlDao = new HtmlDAOMap(pages);
-	}
-	
-	/**
-	 * Inicializa las interfaces con los parámetros de configuración.
-	 * @param properties Propiedades de configuración de la BD.
-	 */
-	private void setDAO(Properties properties) {
-		this.htmlDao = new HtmlDAODB(properties);
-		this.xmlDao = new XmlDAODB(properties);
-		this.xsdDao = new XsdDAODB(properties);
-		this.xsltDao = new XsltDAODB(properties);
+		//this.htmlDao = new HtmlDAOMap(pages);
 	}
 
 	/**
@@ -91,8 +77,8 @@ public class HybridServer {
 							// Acepta clientes y crea un hilo para cada uno.
 							socket = serverSocket.accept();
 							if (stop) break;
-							System.out.println("Nueva conexión entrante: "+socket);	
-							executor.execute(new ClientService(socket, htmlDao, xmlDao, xsdDao, xsltDao));
+							//System.out.println("Nueva conexión entrante: "+socket);	
+							executor.execute(new ClientService(socket, properties));
 						} 
 						catch (Exception e) {
 							System.out.println("Error en servidor:\n" + e.getMessage());
