@@ -19,17 +19,21 @@ public class ClientService implements Runnable {
 	private final String[] RESOURCES = {"html","xml","xsd","xslt"};
 	private HtmlManager htmlManager;
 	private XmlManager xmlManager;
+	private XsdManager xsdManager;
+	private XsltManager xsltManager;
 
 	/**
 	 * Crea un hilo de cliente.
 	 * @param socket Socket de conexión con el servidor.
 	 * @param htmlDao Interfaz para interactuar con el servidor.
 	 */
-	public ClientService(Socket socket, HtmlDAO htmlDao, XmlDAO xmlDao) {
+	public ClientService(Socket socket, HtmlDAO htmlDao, XmlDAO xmlDao, XsdDAO xsdDao, XsltDAO xsltDao) {
 		this.socket = socket;
 		response = new HTTPResponse();
 		htmlManager = new HtmlManager(htmlDao);
 		xmlManager = new XmlManager(xmlDao);
+		xsdManager = new XsdManager(xsdDao);
+		xsltManager = new XsltManager(xsltDao);
 	}
 	
 	/**
@@ -93,6 +97,16 @@ public class ClientService implements Runnable {
 							setResponse(xmlManager.getStatus(), 
 									xmlManager.getContent(), xmlManager.getType());
 						}
+						else if(resource.equals("xsd")){
+							xsdManager.methodGet(request);
+							setResponse(xsdManager.getStatus(), 
+									xsdManager.getContent(), xsdManager.getType());
+						}
+						else if(resource.equals("xslt")){
+							xsltManager.methodGet(request);
+							setResponse(xsltManager.getStatus(), 
+									xsltManager.getContent(), xsltManager.getType());
+						}
 						break;
 					case POST:
 						if(resource.equals("html")) {
@@ -105,6 +119,16 @@ public class ClientService implements Runnable {
 							setResponse(xmlManager.getStatus(), 
 									xmlManager.getContent(), xmlManager.getType());
 						}
+						else if(resource.equals("xsd")){
+							xsdManager.methodPost(request);
+							setResponse(xsdManager.getStatus(), 
+									xsdManager.getContent(), xsdManager.getType());
+						}
+						else if(resource.equals("xslt")){
+							xsltManager.methodPost(request);
+							setResponse(xsltManager.getStatus(), 
+									xsltManager.getContent(), xsltManager.getType());
+						}
 						break;
 					case DELETE:
 						if(resource.equals("html")) {
@@ -116,6 +140,16 @@ public class ClientService implements Runnable {
 							xmlManager.methodDelete(request);
 							setResponse(xmlManager.getStatus(), 
 									xmlManager.getContent(), xmlManager.getType());
+						}
+						else if(resource.equals("xsd")){
+							xsdManager.methodDelete(request);
+							setResponse(xsdManager.getStatus(), 
+									xsdManager.getContent(), xsdManager.getType());
+						}
+						else if(resource.equals("xslt")){
+							xsltManager.methodDelete(request);
+							setResponse(xsltManager.getStatus(), 
+									xsltManager.getContent(), xsltManager.getType());
 						}
 						break;
 					default: break;

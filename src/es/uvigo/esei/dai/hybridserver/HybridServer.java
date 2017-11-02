@@ -17,6 +17,8 @@ public class HybridServer {
 	private ExecutorService executor;
 	private HtmlDAO htmlDao;
 	private XmlDAO xmlDao;
+	private XsdDAO xsdDao;
+	private XsltDAO xsltDao;
 
 	/**
 	 * Constructor vacío.
@@ -59,6 +61,8 @@ public class HybridServer {
 	private void setDAO(Properties properties) {
 		this.htmlDao = new HtmlDAODB(properties);
 		this.xmlDao = new XmlDAODB(properties);
+		this.xsdDao = new XsdDAODB(properties);
+		this.xsltDao = new XsltDAODB(properties);
 	}
 
 	/**
@@ -88,7 +92,7 @@ public class HybridServer {
 							socket = serverSocket.accept();
 							if (stop) break;
 							System.out.println("Nueva conexión entrante: "+socket);	
-							executor.execute(new ClientService(socket, htmlDao, xmlDao));
+							executor.execute(new ClientService(socket, htmlDao, xmlDao, xsdDao, xsltDao));
 						} 
 						catch (Exception e) {
 							System.out.println("Error en servidor:\n" + e.getMessage());
