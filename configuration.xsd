@@ -1,16 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www.esei.uvigo.es/dai/proyecto"
-	xmlns:tns="http://www.esei.uvigo.es/dai/proyecto"
-	elementFormDefault="qualified">
+	xmlns:tns="http://www.esei.uvigo.es/dai/hybridserver"
+    targetNamespace="http://www.esei.uvigo.es/dai/hybridserver"
+	elementFormDefault="unqualified">
     <element name="configuration">
         <complexType>
             <element name="connections">
+                <sequence>
+                    <element name="http" type="integer"/>
+                    <element name="webservice" type="string"/>
+                    <element name="numClients" type="integer"/>
+                </sequence>
             </element>
             <element name="database">
+                <sequence>
+                    <element name="user" type="string"/>
+                    <element name="password" type="string"/>
+                    <element name="url" type="string"/>
+                </sequence>
             </element>
             <element name="servers">
+                <sequence minOccurs="1" maxOccurs="4">
+                    <element name="server" type="tns:server"/>
+                </sequence>
             </element>
         </complexType>
     </element>
+    <complexType name="server">
+        <simpleContent>
+            <extension base="string">
+                <attribute name="name" type="string"/>
+                <attribute name="wsdl" type="string"/>
+                <attribute name="namespace" type="string"/>
+                <attribute name="service" type="string"/>
+                <attribute name="httpAddress" type="string"/>
+            </extension>
+        </simpleContent>
+    </complexType>
 </schema>
