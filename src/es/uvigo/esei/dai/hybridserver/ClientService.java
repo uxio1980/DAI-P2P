@@ -38,6 +38,15 @@ public class ClientService implements Runnable {
 		xsltManager = new XsltManager(new XsltDAODB(properties));
 	}
 	
+	public ClientService(Socket socket, Configuration config) {
+		this.socket = socket;
+		response = new HTTPResponse();
+		htmlManager = new HtmlManager(new HtmlDAODB(config));
+		xmlManager = new XmlManager(new XmlDAODB(config));
+		xsdManager = new XsdManager(new XsdDAODB(config));
+		xsltManager = new XsltManager(new XsltDAODB(config));
+	}
+	
 	/**
 	 * Genera una respuesta HTTP.
 	 * @param Status Status HTTP de la respuesta.

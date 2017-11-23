@@ -25,6 +25,16 @@ public class XmlDAODB implements XmlDAO{
 			System.out.println("Error en HtmlDaoDB:\n\t" + e.getMessage());
 		} 
 	}
+	
+	public XmlDAODB(Configuration config){
+		try {
+			userDb = config.getDbUser();
+			passwordDb = config.getDbPassword();
+			url = config.getDbURL();
+		} catch (Exception e) {
+			System.out.println("Error en HtmlDaoDB:\n\t" + e.getMessage());
+		} 
+	}
 
 	@Override
 	public String getXmlPage(String uuid) {

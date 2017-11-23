@@ -16,6 +16,7 @@ public class HybridServer {
 	private boolean stop;
 	private ExecutorService executor;
 	private Properties properties;
+	private Configuration config;
 
 	/**
 	 * Constructor vacío.
@@ -30,7 +31,10 @@ public class HybridServer {
 	 * Constructor que recibe un archivo de configuración.
 	 */
 	public HybridServer(Configuration config) {
-		// TODO for XML.
+		service_port = config.getHttpPort();	
+		num_clients = config.getNumClients();
+		this.config = config;
+		//this.properties = properties;
 	}
 
 	/**
@@ -78,7 +82,8 @@ public class HybridServer {
 							socket = serverSocket.accept();
 							if (stop) break;
 							//System.out.println("Nueva conexión entrante: "+socket);	
-							executor.execute(new ClientService(socket, properties));
+							//executor.execute(new ClientService(socket, properties));
+							executor.execute(new ClientService(socket, config));
 						} 
 						catch (Exception e) {
 							System.out.println("Error en servidor:\n" + e.getMessage());

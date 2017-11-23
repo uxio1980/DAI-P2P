@@ -25,6 +25,16 @@ public class XsltDAODB implements XsltDAO{
 			System.out.println("Error en HtmlDaoDB:\n\t" + e.getMessage());
 		} 
 	}
+	
+	public XsltDAODB(Configuration config){
+		try {
+			userDb = config.getDbUser();
+			passwordDb = config.getDbPassword();
+			url = config.getDbURL();
+		} catch (Exception e) {
+			System.out.println("Error en HtmlDaoDB:\n\t" + e.getMessage());
+		} 
+	}
 
 	@Override
 	public String getXsltPage(String uuid) {

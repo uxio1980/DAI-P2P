@@ -32,33 +32,33 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import es.uvigo.esei.dai.xml.dom.DOMParsing;
+
 public class XMLConfigurationLoader {
 	public Configuration load(File xmlFile) throws Exception {
 		
+		Document doc = DOMParsing.loadAndValidateWithInternalXSD(xmlFile.getAbsolutePath());
+		System.out.println(DOMParsing.toXML(doc));
 		Configuration conf = new Configuration();
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		factory.setValidating(false);
-		factory.setNamespaceAware(true);
-		factory.setAttribute("http://java.sun.com/xml/jaxp/properties/schemaLanguage",XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		
-		// Se añade el manejador de errores
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		builder.setErrorHandler(new SimpleErrorHandler());
-		Document doc = builder.parse(xmlFile);
 		
 		// Setear conf con los elementos del árbol DOM
 		Element root = (Element)doc.getFirstChild();
+		System.out.println(root.getNodeName());
 		
 		// Connection
-		NodeList nodes = root.getElementsByTagName("connections");
-		conf.setHttpPort(Integer.parseInt(
-				nodes.item(0).toString()
+		NodeList connections = root.getElementsByTagName("connections");
+		NodeList http = ((Element)connections.item(0)).getElementsByTagName("http");
+		System.out.println(http.item(0).getNodeValue());
+
+		/*conf.setHttpPort(Integer.parseInt(
+				nodes.item(0).getNodeValue()
 			));
 		conf.setWebServiceURL(
-				nodes.item(1).toString()
+				nodes.item(1).getNodeValue()
 			);
 		conf.setNumClients(Integer.parseInt(
-				nodes.item(2).toString()
+				nodes.item(2).getNodeValue()
 			));
 		
 		// Database
@@ -90,8 +90,9 @@ public class XMLConfigurationLoader {
 			servers.add(server);
 		}
 		conf.setServers(servers);
-		
+			*/
 		return conf;
+
 	}
 }
 
