@@ -29,6 +29,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -44,53 +45,77 @@ public class XMLConfigurationLoader {
 		
 		// Setear conf con los elementos del árbol DOM
 		Element root = (Element)doc.getFirstChild();
-		System.out.println(root.getNodeName());
 		
-		// Connection
-		NodeList connections = root.getElementsByTagName("connections");
-		NodeList http = ((Element)connections.item(0)).getElementsByTagName("http");
-		System.out.println(http.item(0).getNodeValue());
+		// Configuration
+		List<Node> child = new ArrayList<>();
+		NodeList children = root.getChildNodes();
+		Node nodo;
+		
+		for(int i=0;i<children.getLength();i++){
+			nodo = children.item(i);
+			if (nodo instanceof Element){
+				child.add(nodo);
+			}
+		}
+		
+		Node connections = child.get(0);
+		Node database = child.get(1);
+		Node servers = child.get(2);
 
-		/*conf.setHttpPort(Integer.parseInt(
-				nodes.item(0).getNodeValue()
-			));
-		conf.setWebServiceURL(
-				nodes.item(1).getNodeValue()
-			);
-		conf.setNumClients(Integer.parseInt(
-				nodes.item(2).getNodeValue()
-			));
+		// Connections
+		children = connections.getChildNodes();
+		child = new ArrayList<>();
+		
+		for(int i=0;i<children.getLength();i++){
+			nodo = children.item(i);
+			if (nodo instanceof Element){
+				child.add(nodo);
+			}
+		}	
+		conf.setHttpPort(Integer.parseInt(child.get(0).getTextContent()));
+		conf.setWebServiceURL(child.get(1).getTextContent());
+		conf.setNumClients(Integer.parseInt(child.get(2).getTextContent()));
 		
 		// Database
-		nodes = root.getElementsByTagName("database");
-		conf.setDbUser(
-				nodes.item(0).toString()
-			);
-		conf.setDbPassword(
-				nodes.item(1).toString()
-			);
-		conf.setDbURL(
-				nodes.item(2).toString()
-			);
+		children = database.getChildNodes();
+		child = new ArrayList<>();
+		
+		for(int i=0;i<children.getLength();i++){
+			nodo = children.item(i);
+			if (nodo instanceof Element){
+				child.add(nodo);
+			}
+		}	
+		conf.setDbUser(child.get(0).getTextContent());
+		conf.setDbPassword(child.get(1).getTextContent());
+		conf.setDbURL(child.get(2).getTextContent());
 		
 		// Servers
-		nodes = root.getElementsByTagName("servers");
-		Element element;
-		List<ServerConfiguration> servers = new ArrayList<>();
-		ServerConfiguration server;
-		for(int i=0; i<nodes.getLength(); i++){
-			element = (Element)nodes.item(i);
-			server = new ServerConfiguration(
-				element.getAttribute("name"),
-				element.getAttribute("wsdl"),
-				element.getAttribute("namespace"),
-				element.getAttribute("service"),
-				element.getAttribute("httpAddress")
-			);
-			servers.add(server);
+		children = servers.getChildNodes();
+		child = new ArrayList<>();
+		
+		for(int i=0;i<children.getLength();i++){
+			nodo = children.item(i);
+			if (nodo instanceof Element){
+				child.add(nodo);
+			}
+		}	
+		
+		ServerConfiguration sc = new ServerConfiguration();
+		List<ServerConfiguration> serverList = new ArrayList<>();
+		NamedNodeMap attributes;
+		for(Node n: child){
+			attributes = n.getAttributes();
+			sc.setName(attributes.getNamedItem("name").getTextContent());
+			sc.setWsdl(attributes.getNamedItem("wsdl").getTextContent());
+			sc.setNamespace(attributes.getNamedItem("namespace").getTextContent());
+			sc.setService(attributes.getNamedItem("service").getTextContent());
+			sc.setHttpAddress(attributes.getNamedItem("httpAddress").getTextContent());
+			serverList.add(sc);
+			sc = new ServerConfiguration();
 		}
-		conf.setServers(servers);
-			*/
+		conf.setServers(serverList);
+		
 		return conf;
 
 	}
