@@ -39,7 +39,7 @@ public class XMLConfigurationLoader {
 	public Configuration load(File xmlFile) throws Exception {
 		
 		Document doc = DOMParsing.loadAndValidateWithInternalXSD(xmlFile.getAbsolutePath());
-		System.out.println(DOMParsing.toXML(doc));
+		//System.out.println(DOMParsing.toXML(doc));
 		Configuration conf = new Configuration();
 		
 		

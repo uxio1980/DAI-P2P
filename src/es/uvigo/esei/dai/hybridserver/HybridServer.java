@@ -34,7 +34,6 @@ public class HybridServer {
 		service_port = config.getHttpPort();	
 		num_clients = config.getNumClients();
 		this.config = config;
-		//this.properties = properties;
 	}
 
 	/**
