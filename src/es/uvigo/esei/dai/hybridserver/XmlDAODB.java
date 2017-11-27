@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 public class XmlDAODB implements XmlDAO{
@@ -46,6 +48,30 @@ public class XmlDAODB implements XmlDAO{
 
 			if (result.next()) {
 				return result.getString("content");
+			} else
+				return null;
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public String getXmlSchema(String xslt){
+		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
+				PreparedStatement statement = connection.prepareStatement(
+				"SELECT * FROM XSLT WHERE uuid=?")) {
+			statement.setString(1, xslt);
+			ResultSet result = statement.executeQuery();
+
+			if (result.next()) {
+				String xsd = result.getString("xsd");
+				PreparedStatement statement2 = connection.prepareStatement(
+				"SELECT * FROM XSD WHERE uuid=?");
+				statement2.setString(1, xsd);
+				ResultSet result2 = statement2.executeQuery();
+				if (result2.next())
+					return result2.getString("uuid");
+				else
+					return null;
 			} else
 				return null;
 		} catch (SQLException e) {
@@ -110,6 +136,23 @@ public class XmlDAODB implements XmlDAO{
 				PreparedStatement statement = connection.prepareStatement(
 				"SELECT * FROM XML WHERE uuid=?")) {
 			statement.setString(1, uuid);
+			ResultSet result = statement.executeQuery();
+
+			if (result.first()) {
+				return true;
+			} else
+				return false;
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	@Override
+	public boolean containsTemplate(String xslt) {
+		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
+				PreparedStatement statement = connection.prepareStatement(
+				"SELECT * FROM XSLT WHERE uuid=?")) {
+			statement.setString(1, xslt);
 			ResultSet result = statement.executeQuery();
 
 			if (result.first()) {

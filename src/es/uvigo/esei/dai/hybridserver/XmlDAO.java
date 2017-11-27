@@ -1,5 +1,7 @@
 package es.uvigo.esei.dai.hybridserver;
 
+import java.util.Map;
+
 public interface XmlDAO {
 
 	/**
@@ -8,6 +10,8 @@ public interface XmlDAO {
 	 * @return Contenido de la página web.
 	 */
 	public String getXmlPage(String uuid);
+	
+	public String getXmlSchema(String xslt);
 	
 	/**
 	 * Muestra una lista de links a todas las páginas web XML del servidor.
@@ -34,4 +38,6 @@ public interface XmlDAO {
 	 * @param uuid Identificador de la página web.
 	 */
 	public boolean containsPage(String uuid);
+	
+	public boolean containsTemplate(String xslt);
 }
