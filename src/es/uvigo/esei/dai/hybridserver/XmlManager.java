@@ -1,11 +1,16 @@
 package es.uvigo.esei.dai.hybridserver;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.net.URL;
 import java.util.Map;
 import java.util.UUID;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -64,8 +69,15 @@ public class XmlManager {
 					Document doc = DOMParsing.loadAndValidateWithExternalURL(
 							"http://127.0.0.1:10001/xml?uuid="+uuid, 
 							"http://127.0.0.1:10001/xsd?uuid="+xsd);
-					//content = DOMParsing.toXML(doc);
-					//content = XSLTUtils.transform(xml, xslt)
+					 	
+					URL url = new URL ("http://127.0.0.1:10001/xml?uuid=" + uuid);					
+					URL url2 = new URL ("http://127.0.0.1:10001/xslt?uuid=" + xslt);
+					final StringWriter writer = new StringWriter();
+					XSLTUtils.transform(
+							new StreamSource(url.toString()),
+							new StreamSource(url2.toString()),
+							new StreamResult(writer));
+					content = writer.toString();
 					type = MIME.TEXT_HTML.getMime();
 				} else {
 					status = HTTPResponseStatus.S400;	
