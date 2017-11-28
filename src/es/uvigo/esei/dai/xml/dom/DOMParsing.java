@@ -1,12 +1,16 @@
 package es.uvigo.esei.dai.xml.dom;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.net.URL;
+import java.net.URLConnection;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -97,29 +101,24 @@ public class DOMParsing {
 	public static Document loadAndValidateWithExternalURL(String documentPath, String schemaPath) 
 			throws ParserConfigurationException, SAXException, IOException {
 				// Construcción del schema		
-				URL url = new URL(schemaPath);
-				//File f = new File(url.getFile());
-				//System.out.println("dfgdag"+f.canRead());
-				SchemaFactory schemaFactory = 
-					SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-				Schema schema = schemaFactory.newSchema(new File(
-						new URL(schemaPath).getFile()));
-				System.out.println(">>"+schema.toString());
-				
-				// Construcción del parser del documento. Se establece el esquema y se activa
-				// la validación y comprobación de namespaces
-				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-				factory.setValidating(false);
-				factory.setNamespaceAware(true);
-				factory.setSchema(schema);
-				
-				// Se añade el manejador de errores
-				DocumentBuilder builder = factory.newDocumentBuilder();
-				builder.setErrorHandler(new SimpleErrorHandler());
-				
-				return builder.parse(new File(
-						new URL(documentPath).getFile()));
-			}
+
+		SchemaFactory schemaFactory = 
+			SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+		Schema schema = schemaFactory.newSchema(new URL(schemaPath));
+		
+		// Construcción del parser del documento. Se establece el esquema y se activa
+		// la validación y comprobación de namespaces
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setValidating(false);
+		factory.setNamespaceAware(true);
+		factory.setSchema(schema);
+		
+		// Se añade el manejador de errores
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		builder.setErrorHandler(new SimpleErrorHandler());
+		
+		return builder.parse(documentPath);
+	}
 	
 	public static String toXML(Document document)
 	throws TransformerException {

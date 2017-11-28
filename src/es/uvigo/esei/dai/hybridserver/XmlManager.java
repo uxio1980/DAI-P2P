@@ -14,6 +14,7 @@ import es.uvigo.esei.dai.hybridserver.http.HTTPRequest;
 import es.uvigo.esei.dai.hybridserver.http.HTTPResponseStatus;
 import es.uvigo.esei.dai.hybridserver.http.MIME;
 import es.uvigo.esei.dai.xml.dom.DOMParsing;
+import es.uvigo.esei.dai.xml.xslt.XSLTUtils;
 
 public class XmlManager {
 
@@ -63,8 +64,8 @@ public class XmlManager {
 					Document doc = DOMParsing.loadAndValidateWithExternalURL(
 							"http://127.0.0.1:10001/xml?uuid="+uuid, 
 							"http://127.0.0.1:10001/xsd?uuid="+xsd);
-					System.out.println(">" +DOMParsing.toXML(doc));
-					//content =
+					//content = DOMParsing.toXML(doc);
+					//content = XSLTUtils.transform(xml, xslt)
 					type = MIME.TEXT_HTML.getMime();
 				} else {
 					status = HTTPResponseStatus.S400;	
