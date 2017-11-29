@@ -23,6 +23,7 @@ public class ClientService implements Runnable {
 	private XmlManager xmlManager;
 	private XsdManager xsdManager;
 	private XsltManager xsltManager;
+	private Configuration config;
 
 	/**
 	 * Crea un hilo de cliente e inicializa los parámetros de conexión con la BD.
@@ -40,6 +41,7 @@ public class ClientService implements Runnable {
 	
 	public ClientService(Socket socket, Configuration config) {
 		this.socket = socket;
+		this.config = config;
 		response = new HTTPResponse();
 		htmlManager = new HtmlManager(new HtmlDAODB(config));
 		xmlManager = new XmlManager(new XmlDAODB(config));
@@ -109,7 +111,7 @@ public class ClientService implements Runnable {
 						break;
 					case "xml":
 						if(method.equals("GET"))
-							xmlManager.methodGet(request);
+							xmlManager.methodGet(request, config.getHttpPort());
 						else if(method.equals("POST"))
 							xmlManager.methodPost(request);
 						else if(method.equals("DELETE"))

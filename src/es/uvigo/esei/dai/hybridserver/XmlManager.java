@@ -1,20 +1,15 @@
 package es.uvigo.esei.dai.hybridserver;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.Map;
 import java.util.UUID;
-
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-
-import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
-
 import es.uvigo.esei.dai.hybridserver.http.HTTPRequest;
 import es.uvigo.esei.dai.hybridserver.http.HTTPResponseStatus;
 import es.uvigo.esei.dai.hybridserver.http.MIME;
@@ -47,8 +42,8 @@ public class XmlManager {
 	 * @throws ParserConfigurationException 
 	 * @throws TransformerException 
 	 */
-	public void methodGet(HTTPRequest request) throws ParserConfigurationException, 
-		SAXException, IOException, TransformerException{
+	public void methodGet(HTTPRequest request, int port) 
+			throws IOException, TransformerException{
 		params = request.getResourceParameters();
 		uuid = params.get("uuid");
 		String xslt = params.get("xslt");
@@ -60,35 +55,37 @@ public class XmlManager {
 			type = MIME.TEXT_HTML.getMime();
 		}
 		else {
-			// Comprueba si existe la página en el servidor.
+			// Comprueba si existe la página en el servidor y si tiene plantilla.
 			if (xmlDao.containsPage(uuid) && xmlDao.containsTemplate(xslt)) {
-				status = HTTPResponseStatus.S200;
-				String xsd;
-				
-				if((xsd = xmlDao.getXmlSchema(xslt)) != null){
-					Document doc = DOMParsing.loadAndValidateWithExternalURL(
-							"http://127.0.0.1:10001/xml?uuid="+uuid, 
-							"http://127.0.0.1:10001/xsd?uuid="+xsd);
-					 	
-					URL url = new URL ("http://127.0.0.1:10001/xml?uuid=" + uuid);					
-					URL url2 = new URL ("http://127.0.0.1:10001/xslt?uuid=" + xslt);
-					final StringWriter writer = new StringWriter();
+				String xsd = xmlDao.getXmlSchema(xslt);
+				URL urlXml = new URL ("http","localhost",port,"/xml?uuid=" + uuid);					
+				URL urlXslt = new URL ("http","localhost",port,"/xslt?uuid=" + xslt);
+				URL urlXsd = new URL ("http","localhost",port,"/xsd?uuid="+xsd);
+				try{
+					DOMParsing.loadAndValidateWithExternalURL(
+						urlXml.toString(), 
+						urlXsd.toString());
+					StringWriter writer = new StringWriter();
 					XSLTUtils.transform(
-							new StreamSource(url.toString()),
-							new StreamSource(url2.toString()),
+							new StreamSource(urlXml.toString()),
+							new StreamSource(urlXslt.toString()),
 							new StreamResult(writer));
+					status = HTTPResponseStatus.S200;
 					content = writer.toString();
 					type = MIME.TEXT_HTML.getMime();
-				} else {
+				} catch(Exception e){
 					status = HTTPResponseStatus.S400;	
 					type = MIME.TEXT_HTML.getMime();
 				}
 			}
-			else if (xmlDao.containsPage(uuid)) {
+			// XML sin plantilla XSLT.
+			else if (xmlDao.containsPage(uuid) && xslt==null) {
 				status = HTTPResponseStatus.S200;
 				content = xmlDao.getXmlPage(uuid);
 				type = MIME.APPLICATION_XML.getMime();
-			} else{
+			}
+			// No existe la página.
+			else{
 				status = HTTPResponseStatus.S404;	
 				type = MIME.APPLICATION_XML.getMime();
 			}

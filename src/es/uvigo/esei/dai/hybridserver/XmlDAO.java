@@ -1,7 +1,5 @@
 package es.uvigo.esei.dai.hybridserver;
 
-import java.util.Map;
-
 public interface XmlDAO {
 
 	/**

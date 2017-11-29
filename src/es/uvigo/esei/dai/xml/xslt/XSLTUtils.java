@@ -1,10 +1,8 @@
 package es.uvigo.esei.dai.xml.xslt;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.StringWriter;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -12,8 +10,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-
-import org.xml.sax.SAXException;
 
 public class XSLTUtils {
 	public static void transform(Source xmlSource, Source xsltSource, Result result

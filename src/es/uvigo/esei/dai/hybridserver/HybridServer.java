@@ -79,8 +79,7 @@ public class HybridServer {
 						try  {
 							// Acepta clientes y crea un hilo para cada uno.
 							socket = serverSocket.accept();
-							if (stop) break;
-							//System.out.println("Nueva conexión entrante: "+socket);	
+							if (stop) break;	
 							//executor.execute(new ClientService(socket, properties));
 							executor.execute(new ClientService(socket, config));
 						} 

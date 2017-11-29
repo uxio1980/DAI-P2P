@@ -1,16 +1,11 @@
 package es.uvigo.esei.dai.xml.dom;
 
-import java.io.BufferedReader;
+
 import java.io.File;
-import java.io.FileReader;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+
 import java.io.StringWriter;
-import java.net.URL;
-import java.net.URLConnection;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -22,6 +17,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
@@ -79,10 +75,10 @@ public class DOMParsing {
 	public static Document loadAndValidateWithExternalXSD(String documentPath, String schemaPath) 
 	throws ParserConfigurationException, SAXException, IOException {
 		// Construcción del schema
+		System.out.println(">> "+schemaPath);
 		SchemaFactory schemaFactory = 
 			SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		Schema schema = schemaFactory.newSchema(new File(schemaPath));
-		System.out.println(">>"+schema.toString());
 		
 		// Construcción del parser del documento. Se establece el esquema y se activa
 		// la validación y comprobación de namespaces
@@ -104,7 +100,7 @@ public class DOMParsing {
 
 		SchemaFactory schemaFactory = 
 			SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		Schema schema = schemaFactory.newSchema(new URL(schemaPath));
+		Schema schema = schemaFactory.newSchema(new StreamSource(schemaPath));
 		
 		// Construcción del parser del documento. Se establece el esquema y se activa
 		// la validación y comprobación de namespaces
