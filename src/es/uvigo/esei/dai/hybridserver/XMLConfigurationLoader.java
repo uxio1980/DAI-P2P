@@ -18,11 +18,100 @@
 package es.uvigo.esei.dai.hybridserver;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import es.uvigo.esei.dai.xml.dom.DOMParsing;
 
 public class XMLConfigurationLoader {
-	public Configuration load(File xmlFile)
-	throws Exception {
-		// Implementar en la semana 9. 
-		return null;
+	public Configuration load(File xmlFile) throws Exception {
+		
+		Document doc = DOMParsing.loadAndValidateWithInternalXSD(xmlFile.getAbsolutePath());
+		//System.out.println(DOMParsing.toXML(doc));
+		Configuration conf = new Configuration();
+		
+		
+		// Setear conf con los elementos del árbol DOM
+		Element root = (Element)doc.getFirstChild();
+		
+		// Configuration
+		List<Node> child = new ArrayList<>();
+		NodeList children = root.getChildNodes();
+		Node nodo;
+		
+		for(int i=0;i<children.getLength();i++){
+			nodo = children.item(i);
+			if (nodo instanceof Element){
+				child.add(nodo);
+			}
+		}
+		
+		Node connections = child.get(0);
+		Node database = child.get(1);
+		Node servers = child.get(2);
+
+		// Connections
+		children = connections.getChildNodes();
+		child = new ArrayList<>();
+		
+		for(int i=0;i<children.getLength();i++){
+			nodo = children.item(i);
+			if (nodo instanceof Element){
+				child.add(nodo);
+			}
+		}	
+		conf.setHttpPort(Integer.parseInt(child.get(0).getTextContent()));
+		conf.setWebServiceURL(child.get(1).getTextContent());
+		conf.setNumClients(Integer.parseInt(child.get(2).getTextContent()));
+		
+		// Database
+		children = database.getChildNodes();
+		child = new ArrayList<>();
+		
+		for(int i=0;i<children.getLength();i++){
+			nodo = children.item(i);
+			if (nodo instanceof Element){
+				child.add(nodo);
+			}
+		}	
+		conf.setDbUser(child.get(0).getTextContent());
+		conf.setDbPassword(child.get(1).getTextContent());
+		conf.setDbURL(child.get(2).getTextContent());
+		
+		// Servers
+		children = servers.getChildNodes();
+		child = new ArrayList<>();
+		
+		for(int i=0;i<children.getLength();i++){
+			nodo = children.item(i);
+			if (nodo instanceof Element){
+				child.add(nodo);
+			}
+		}	
+		
+		ServerConfiguration sc = new ServerConfiguration();
+		List<ServerConfiguration> serverList = new ArrayList<>();
+		NamedNodeMap attributes;
+		for(Node n: child){
+			attributes = n.getAttributes();
+			sc.setName(attributes.getNamedItem("name").getTextContent());
+			sc.setWsdl(attributes.getNamedItem("wsdl").getTextContent());
+			sc.setNamespace(attributes.getNamedItem("namespace").getTextContent());
+			sc.setService(attributes.getNamedItem("service").getTextContent());
+			sc.setHttpAddress(attributes.getNamedItem("httpAddress").getTextContent());
+			serverList.add(sc);
+			sc = new ServerConfiguration();
+		}
+		conf.setServers(serverList);
+		
+		return conf;
+
 	}
 }
+

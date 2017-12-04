@@ -14,8 +14,9 @@ public class HybridServer {
 	private int num_clients;
 	private Thread serverThread;
 	private boolean stop;
-	private HtmlDAO htmlDao;
 	private ExecutorService executor;
+	private Properties properties;
+	private Configuration config;
 
 	/**
 	 * Constructor vacío.
@@ -23,22 +24,16 @@ public class HybridServer {
 	public HybridServer() {
 		service_port = 8888;	
 		num_clients = 50;
-		setHtmlDao(new HtmlDAODB(new Properties()));
-	}
-
-	/**
-	 * Constructor que recibe un mapa de webs.
-	 * @param pages Mapa de páginas web <uuid,contenido>.
-	 */
-	public HybridServer(Map<String, String> pages) {
-		setHtmlDao(new HtmlDAOMap(pages));
+		properties = new Properties();
 	}
 	
 	/**
 	 * Constructor que recibe un archivo de configuración.
 	 */
 	public HybridServer(Configuration config) {
-		// TODO for XML.
+		service_port = config.getHttpPort();	
+		num_clients = config.getNumClients();
+		this.config = config;
 	}
 
 	/**
@@ -48,7 +43,15 @@ public class HybridServer {
 	public HybridServer(Properties properties) {
 		service_port = Integer.parseInt(properties.getProperty("port","8888"));	
 		num_clients = Integer.parseInt(properties.getProperty("numClients", "50"));
-		setHtmlDao(new HtmlDAODB(properties));
+		this.properties = properties;
+	}
+	
+	/**
+	 * Constructor que recibe un mapa de webs.
+	 * @param pages Mapa de páginas web <uuid,contenido>.
+	 */
+	public HybridServer(Map<String, String> pages) {
+		//this.htmlDao = new HtmlDAOMap(pages);
 	}
 
 	/**
@@ -57,14 +60,6 @@ public class HybridServer {
 	 */
 	public int getPort() {
 		return service_port;
-	}
-	
-	/**
-	 * Establece la interfaz HtmlDAO.
-	 * @param htmlDao Instancia de la interfaz HtmlDAO.
-	 */
-	public void setHtmlDao(HtmlDAO htmlDao) {
-		this.htmlDao = htmlDao;
 	}
 
 	/**
@@ -84,9 +79,9 @@ public class HybridServer {
 						try  {
 							// Acepta clientes y crea un hilo para cada uno.
 							socket = serverSocket.accept();
-							if (stop) break;
-							System.out.println("Nueva conexión entrante: "+socket);	
-							executor.execute(new ClientService(socket, htmlDao));
+							if (stop) break;	
+							//executor.execute(new ClientService(socket, properties));
+							executor.execute(new ClientService(socket, config));
 						} 
 						catch (Exception e) {
 							System.out.println("Error en servidor:\n" + e.getMessage());

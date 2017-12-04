@@ -5,91 +5,50 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Arrays;
-import java.util.Map;
-import java.util.UUID;
+import java.util.Properties;
 
 import es.uvigo.esei.dai.hybridserver.http.HTTPHeaders;
 import es.uvigo.esei.dai.hybridserver.http.HTTPParseException;
 import es.uvigo.esei.dai.hybridserver.http.HTTPRequest;
 import es.uvigo.esei.dai.hybridserver.http.HTTPResponse;
 import es.uvigo.esei.dai.hybridserver.http.HTTPResponseStatus;
+import es.uvigo.esei.dai.hybridserver.http.MIME;
 
 public class ClientService implements Runnable {
 
 	private Socket socket;
-	private HtmlManager htmlManager;
-	private Map<String,String> params;
 	private HTTPResponse response;
-	private String uuid;
 	private final String[] RESOURCES = {"html","xml","xsd","xslt"};
+	private HtmlManager htmlManager;
+	private XmlManager xmlManager;
+	private XsdManager xsdManager;
+	private XsltManager xsltManager;
+	private Configuration config;
 
 	/**
-	 * Crea un hilo de cliente.
+	 * Crea un hilo de cliente e inicializa los parámetros de conexión con la BD.
 	 * @param socket Socket de conexión con el servidor.
 	 * @param htmlDao Interfaz para interactuar con el servidor.
 	 */
-	public ClientService(Socket socket, HtmlDAO htmlDao) {
+	public ClientService(Socket socket, Properties properties) {
 		this.socket = socket;
 		response = new HTTPResponse();
-		htmlManager = new HtmlManager(htmlDao);
+		htmlManager = new HtmlManager(new HtmlDAODB(properties));
+		xmlManager = new XmlManager(new XmlDAODB(properties));
+		xsdManager = new XsdManager(new XsdDAODB(properties));
+		xsltManager = new XsltManager(new XsltDAODB(properties));
 	}
-
-	/**
-	 * Recibe una petición GET y genera una respuesta que puede ser:
-	 * Lista de todas las páginas, una sola página o un error 404.
-	 * @param request Petición HTTP.
-	 */
-	private void methodGet(HTTPRequest request){
-		params = request.getResourceParameters();
-		uuid = params.get("uuid");
-
-		// Comprueba si se recibe el parámetro uuid.
-		if(uuid == null) {  // Recupera una lista de páginas.
-			setResponse(HTTPResponseStatus.S200, htmlManager.getHtmlList(), request.getResourceName());
-		}
-		else {
-			// Comprueba si existe la página en el servidor.
-			if (htmlManager.contains(uuid)) {
-				String id = htmlManager.get(uuid); // Recupera una página.
-				setResponse(HTTPResponseStatus.S200, id, request.getResourceName());		
-			} else
-				setResponse(HTTPResponseStatus.S404, request.getResourceName());
-		}
+	
+	public ClientService(Socket socket, Configuration config) {
+		this.socket = socket;
+		this.config = config;
+		response = new HTTPResponse();
+		htmlManager = new HtmlManager(new HtmlDAODB(config));
+		xmlManager = new XmlManager(new XmlDAODB(config));
+		xsdManager = new XsdManager(new XsdDAODB(config));
+		xsltManager = new XsltManager(new XsltDAODB(config));
 	}
-
-	/**
-	 * Recibe una petición POST y genera una respuesta positiva o un error 400.
-	 * @param request Petición HTTP.
-	 */
-	private void methodPost(HTTPRequest request){	
-		params = request.getResourceParameters();				
-		UUID randomUuid = UUID.randomUUID();
-		uuid = randomUuid.toString();
-
-		// Comprueba si el parámetro del formulario se llama html.
-		if(params.containsKey("html")){
-			htmlManager.create(uuid, params.get("html")); // Crea la página.
-			setResponse(HTTPResponseStatus.S200, "<a href=\"html?uuid="+ uuid +"\">"+ uuid +"</a>", request.getResourceName());
-		} else
-			setResponse(HTTPResponseStatus.S400, request.getResourceName());
-	}
-
-	/**
-	 * Recibe una petición DELETE y genera una respuesta positiva o un error 404.
-	 * @param request Petición HTTP.
-	 */
-	private void methodDelete(HTTPRequest request){
-		params = request.getResourceParameters();
-		uuid = params.get("uuid");
-
-		// Comprueba si existe la página en el servidor.
-		if(htmlManager.contains(uuid)){
-			htmlManager.delete(uuid); // Borra la página.
-			setResponse(HTTPResponseStatus.S200, request.getResourceName());
-		} else
-			setResponse(HTTPResponseStatus.S404, request.getResourceName());
-	}
-
+	
 	/**
 	 * Genera una respuesta HTTP.
 	 * @param Status Status HTTP de la respuesta.
@@ -99,20 +58,20 @@ public class ClientService implements Runnable {
 	private void setResponse(HTTPResponseStatus status, String content, String type){
 		response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
 		response.setStatus(status);
-		response.setContent(content);
-		response.putParameter("Content-Type", "text/"+type);
+		response.putParameter("Content-Type", type);
+		if(content != null)
+			response.setContent(content);
 	}
-
+	
 	/**
 	 * Genera una respuesta HTTP.
 	 * @param status Status HTTP de la respuesta.
 	 * @param type Tipo del contenido.
 	 */
-	private void setResponse(HTTPResponseStatus status, String type){
+	private void setResponse(HTTPResponseStatus status){
 		response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
 		response.setStatus(status);
 		response.setContent(status.getStatus());
-		response.putParameter("Content-Type", "text/"+type);
 	}
 	
 	/**
@@ -141,29 +100,60 @@ public class ClientService implements Runnable {
 		try (Socket s = socket){
 			HTTPRequest request = new HTTPRequest(
 					new InputStreamReader(socket.getInputStream()));
-			System.out.println(request);
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+			String method = request.getMethod().toString();
 			String resource = request.getResourceName();
 
 			// Comprueba si el recurso es válido. 
 			// Si está vacío lleva a la página de inicio. Si no existe muestra un error.
 			if(Arrays.asList(RESOURCES).contains(resource)){
 				try{
-					switch (request.getMethod()) {
-					case GET:
-						methodGet(request);
+					// En función del método y tipo de recurso llama a un Manager distinto.
+					switch(resource) {
+					case "html":
+						if(method.equals("GET"))
+							htmlManager.methodGet(request);
+						else if(method.equals("POST"))
+							htmlManager.methodPost(request);
+						else if(method.equals("DELETE"))
+							htmlManager.methodDelete(request);
+						setResponse(htmlManager.getStatus(), 
+								htmlManager.getContent(), htmlManager.getType());
 						break;
-					case POST:
-						methodPost(request);
+					case "xml":
+						if(method.equals("GET"))
+							xmlManager.methodGet(request, config.getHttpPort());
+						else if(method.equals("POST"))
+							xmlManager.methodPost(request);
+						else if(method.equals("DELETE"))
+							xmlManager.methodDelete(request);
+						setResponse(xmlManager.getStatus(), 
+								xmlManager.getContent(), xmlManager.getType());
 						break;
-					case DELETE:
-						methodDelete(request);
+					case "xsd":
+						if(method.equals("GET"))
+							xsdManager.methodGet(request);
+						else if(method.equals("POST"))
+							xsdManager.methodPost(request);
+						else if(method.equals("DELETE"))
+							xsdManager.methodDelete(request);
+						setResponse(xsdManager.getStatus(), 
+								xsdManager.getContent(), xsdManager.getType());
 						break;
-					default: break;
+					case "xslt":
+						if(method.equals("GET"))
+							xsltManager.methodGet(request);
+						else if(method.equals("POST"))
+							xsltManager.methodPost(request);
+						else if(method.equals("DELETE"))
+							xsltManager.methodDelete(request);
+						setResponse(xsltManager.getStatus(), 
+								xsltManager.getContent(), xsltManager.getType());
+						break;
 					}
 					// Si se produce un error no experado en la BD lanza un error 500.
 				} catch(Exception e) {
-					setResponse(HTTPResponseStatus.S500,resource);
+					setResponse(HTTPResponseStatus.S500, null, resource);
 					out.println(getResponse());
 				}
 			}
@@ -173,14 +163,15 @@ public class ClientService implements Runnable {
 						"<head><meta charset='UTF-8'></head> " +
 						"<p><strong>Hybrid Server</strong></p> " +
 						"Iago Fernández González & Jose Eugenio González Fernández" +
-						"</html>", "html");	
+						"</html>", MIME.TEXT_HTML.getMime());	
 			else
 				setResponse(HTTPResponseStatus.S400);
 
-			System.out.println(getResponse());
 			out.println(getResponse());
-
-		} catch (IOException | HTTPParseException e) {
+			System.out.println(request);
+			System.out.println(getResponse()+"\n");
+		} 
+		catch (IOException | HTTPParseException e) {
 			System.out.println("\t>> Error en Thread Client:\n" + e.getMessage());
 		} 
 	}

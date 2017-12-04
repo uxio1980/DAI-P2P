@@ -25,6 +25,16 @@ public class HtmlDAODB implements HtmlDAO {
 			System.out.println("Error en HtmlDaoDB:\n\t" + e.getMessage());
 		} 
 	}
+	
+	public HtmlDAODB(Configuration config){
+		try {
+			userDb = config.getDbUser();
+			passwordDb = config.getDbPassword();
+			url = config.getDbURL();
+		} catch (Exception e) {
+			System.out.println("Error en HtmlDaoDB:\n\t" + e.getMessage());
+		} 
+	}
 
 	@Override
 	public String getHtmlPage(String uuid) {
@@ -54,7 +64,7 @@ public class HtmlDAODB implements HtmlDAO {
 
 			while(result.next()) {
 				uuid = result.getString("uuid");
-				sb.append("<a href='/html?uuid="+ uuid +"' target='_blank'>"+ uuid +"</a><br />");
+				sb.append("<a href='/html?uuid="+ uuid +"' target='_blank'>"+ uuid +"</a><br/>");
 			}
 			return sb.toString();
 		} catch (SQLException e) {
