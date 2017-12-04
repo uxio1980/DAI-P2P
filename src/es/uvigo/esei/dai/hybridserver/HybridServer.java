@@ -9,6 +9,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import javax.xml.ws.Endpoint;
+
+import com.sun.org.apache.bcel.internal.generic.NEW;
+
 public class HybridServer {
 	private int service_port;
 	private int num_clients;
@@ -69,6 +73,12 @@ public class HybridServer {
 		this.serverThread = new Thread() {
 			@Override
 			public void run() {
+				System.out.print("Publicando servicios web... ");
+				Endpoint.publish("http://localhost:20001/hs", new ServersDAODB(config));
+				Endpoint.publish("http://localhost:20002/hs", new ServersDAODB(config));
+				Endpoint.publish("http://localhost:20003/hs", new ServersDAODB(config));
+				Endpoint.publish("http://localhost:20004/hs", new ServersDAODB(config));
+				System.out.println("\t[OK]");
 				System.out.print("Inicializando servidor... ");
 				Socket socket = null;
 				try (final ServerSocket serverSocket = new ServerSocket(service_port)) {

@@ -37,6 +37,17 @@ public class HtmlManager {
 			status = HTTPResponseStatus.S200;
 			content = htmlDao.getHtmlList(); // Recupera una lista de páginas.
 			type = MIME.TEXT_HTML.getMime();
+			if (content == null) {
+				for (ServersDAO server: ServersManager.getServers()) {
+					content = server.getHTML().toString();
+					if (content != null)
+						break;
+				}
+				if (content==null) {
+					status = HTTPResponseStatus.S404;	
+					type = MIME.TEXT_HTML.getMime();
+				}
+			}
 		}
 		else {
 			// Comprueba si existe la página en el servidor.

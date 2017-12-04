@@ -3,9 +3,16 @@ package es.uvigo.esei.dai.hybridserver;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.MalformedURLException;
 import java.net.Socket;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
+
+import javax.xml.namespace.QName;
+import javax.xml.ws.Service;
 
 import es.uvigo.esei.dai.hybridserver.http.HTTPHeaders;
 import es.uvigo.esei.dai.hybridserver.http.HTTPParseException;
@@ -24,6 +31,7 @@ public class ClientService implements Runnable {
 	private XsdManager xsdManager;
 	private XsltManager xsltManager;
 	private Configuration config;
+	private ServersManager serversManager;
 
 	/**
 	 * Crea un hilo de cliente e inicializa los parámetros de conexión con la BD.
@@ -39,7 +47,7 @@ public class ClientService implements Runnable {
 		xsltManager = new XsltManager(new XsltDAODB(properties));
 	}
 	
-	public ClientService(Socket socket, Configuration config) {
+	public ClientService(Socket socket, Configuration config) throws MalformedURLException {
 		this.socket = socket;
 		this.config = config;
 		response = new HTTPResponse();
@@ -47,6 +55,7 @@ public class ClientService implements Runnable {
 		xmlManager = new XmlManager(new XmlDAODB(config));
 		xsdManager = new XsdManager(new XsdDAODB(config));
 		xsltManager = new XsltManager(new XsltDAODB(config));
+		serversManager = new ServersManager(config);
 	}
 	
 	/**
@@ -113,6 +122,7 @@ public class ClientService implements Runnable {
 					case "html":
 						if(method.equals("GET"))
 							htmlManager.methodGet(request);
+							//serversManager.methodGetHtml(request);
 						else if(method.equals("POST"))
 							htmlManager.methodPost(request);
 						else if(method.equals("DELETE"))
