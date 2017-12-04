@@ -66,6 +66,17 @@ public class ClientService implements Runnable {
 	/**
 	 * Genera una respuesta HTTP.
 	 * @param status Status HTTP de la respuesta.
+	 * @param type Tipo del contenido.
+	 */
+	private void setResponse(HTTPResponseStatus status){
+		response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
+		response.setStatus(status);
+		response.setContent(status.getStatus());
+	}
+	
+	/**
+	 * Genera una respuesta HTTP.
+	 * @param status Status HTTP de la respuesta.
 	 */
 	private void setResponse(HTTPResponseStatus status){
 		response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
@@ -155,6 +166,7 @@ public class ClientService implements Runnable {
 						"</html>", MIME.TEXT_HTML.getMime());	
 			else
 				setResponse(HTTPResponseStatus.S400);
+
 			out.println(getResponse());
 			System.out.println(request);
 			System.out.println(getResponse()+"\n");
