@@ -82,16 +82,6 @@ public class ClientService implements Runnable {
 		response.setStatus(status);
 		response.setContent(status.getStatus());
 	}
-	
-	/**
-	 * Genera una respuesta HTTP.
-	 * @param status Status HTTP de la respuesta.
-	 */
-	private void setResponse(HTTPResponseStatus status){
-		response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
-		response.setStatus(status);
-		response.setContent(status.getStatus());
-	}
 
 	/**
 	 * Devuelve una respuesta HTTP.
@@ -122,7 +112,6 @@ public class ClientService implements Runnable {
 					case "html":
 						if(method.equals("GET"))
 							htmlManager.methodGet(request);
-							//serversManager.methodGetHtml(request);
 						else if(method.equals("POST"))
 							htmlManager.methodPost(request);
 						else if(method.equals("DELETE"))

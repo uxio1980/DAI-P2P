@@ -26,6 +26,23 @@ public class Launcher {
 			HybridServer server = new HybridServer(c);
 			server.start();
 		}
+		else if (args.length == 4 ){
+			//Properties dataConfig = loadParameters(args[0]); 
+			XMLConfigurationLoader cl = new XMLConfigurationLoader();
+			Configuration c1 = cl.load(new File(args[0]));
+			Configuration c2 = cl.load(new File(args[1]));
+			Configuration c3 = cl.load(new File(args[2]));
+			Configuration c4 = cl.load(new File(args[3]));
+			// Se inicia el servidor.
+			HybridServer server1 = new HybridServer(c1);
+			HybridServer server2 = new HybridServer(c2);
+			HybridServer server3 = new HybridServer(c3);
+			HybridServer server4 = new HybridServer(c4);
+			server1.start();
+			server2.start();
+			server3.start();
+			server4.start();
+		}
 		else
 			System.out.println("ERROR: demasiados parámetros.");
 		

@@ -28,46 +28,19 @@ public class ServersManager {
 		Service service;
 		ServersDAO server;
 		
-		for (ServerConfiguration serverConf : config.getServers()){
-			url = new URL(serverConf.getWsdl());
-			name = new QName(serverConf.getNamespace(), serverConf.getService());
-			service = Service.create(url, name);
-			server = service.getPort(ServersDAO.class);
-			servers.add(server);
+		for (ServerConfiguration serverConf : config.getServers()){	
+			if(!serverConf.getName().equals("Down Server")){
+				name = new QName(serverConf.getNamespace(), "ServersDAODBService");
+				url = new URL(serverConf.getWsdl());
+				service = Service.create(url, name);
+				server = service.getPort(ServersDAO.class);
+				servers.add(server);
+			}
 		}
 	}
 	
 	public static List<ServersDAO> getServers(){
 		return servers;
-	}
-	
-	/**
-	 * Recibe una petición GET y genera una respuesta que puede ser:
-	 * Lista de todas las páginas, una sola página o un error 404.
-	 * @param request Petición HTTP.
-	 */
-	public void methodGetHtml(HTTPRequest request){
-		params = request.getResourceParameters();
-		uuid = params.get("uuid");
-
-		// Comprueba si se recibe el parámetro uuid.
-		if(uuid == null) {  // Recupera una lista de páginas.
-			status = HTTPResponseStatus.S200;
-			type = MIME.TEXT_HTML.getMime();
-			content = "";
-			
-		}
-/*		else {
-			// Comprueba si existe la página en el servidor.
-			if (htmlDao.containsPage(uuid)) {
-				status = HTTPResponseStatus.S200;
-				content = htmlDao.getHtmlPage(uuid);
-				type = MIME.TEXT_HTML.getMime();		
-			} else{
-				status = HTTPResponseStatus.S404;	
-				type = MIME.TEXT_HTML.getMime();
-			}
-		}*/
 	}
 
 	

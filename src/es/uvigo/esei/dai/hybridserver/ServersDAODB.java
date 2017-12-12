@@ -69,6 +69,7 @@ public class ServersDAODB implements ServersDAO{
 		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
 				PreparedStatement statement = connection.prepareStatement(
 				"SELECT * FROM HTML WHERE uuid=?")) {
+			System.out.println(">>>>"+url);
 			statement.setString(1, uuid);
 			ResultSet result = statement.executeQuery();
 

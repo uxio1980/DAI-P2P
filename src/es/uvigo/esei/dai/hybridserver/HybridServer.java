@@ -21,6 +21,7 @@ public class HybridServer {
 	private ExecutorService executor;
 	private Properties properties;
 	private Configuration config;
+	private Endpoint ep;
 
 	/**
 	 * Constructor vacío.
@@ -74,10 +75,7 @@ public class HybridServer {
 			@Override
 			public void run() {
 				System.out.print("Publicando servicios web... ");
-				Endpoint.publish("http://localhost:20001/hs", new ServersDAODB(config));
-				Endpoint.publish("http://localhost:20002/hs", new ServersDAODB(config));
-				Endpoint.publish("http://localhost:20003/hs", new ServersDAODB(config));
-				Endpoint.publish("http://localhost:20004/hs", new ServersDAODB(config));
+				ep = Endpoint.publish(config.getWebServiceURL(), new ServersDAODB(config));
 				System.out.println("\t[OK]");
 				System.out.print("Inicializando servidor... ");
 				Socket socket = null;
@@ -127,6 +125,7 @@ public class HybridServer {
 			throw new RuntimeException(e);
 		}
 		executor.shutdownNow();
+		ep.stop();
 		try {
 			executor.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
 		} catch (InterruptedException e) {

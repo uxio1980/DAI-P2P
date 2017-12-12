@@ -37,27 +37,35 @@ public class HtmlManager {
 			status = HTTPResponseStatus.S200;
 			content = htmlDao.getHtmlList(); // Recupera una lista de páginas.
 			type = MIME.TEXT_HTML.getMime();
-			if (content == null) {
+			if(content.isEmpty()) {
 				for (ServersDAO server: ServersManager.getServers()) {
 					content = server.getHTML().toString();
-					if (content != null)
+					if (!content.isEmpty())
 						break;
 				}
-				if (content==null) {
+				if (content.isEmpty()) {
 					status = HTTPResponseStatus.S404;	
 					type = MIME.TEXT_HTML.getMime();
 				}
 			}
 		}
 		else {
+			status = HTTPResponseStatus.S200;
 			// Comprueba si existe la página en el servidor.
-			if (htmlDao.containsPage(uuid)) {
-				status = HTTPResponseStatus.S200;
+			if (htmlDao.containsPage(uuid)) {	
 				content = htmlDao.getHtmlPage(uuid);
 				type = MIME.TEXT_HTML.getMime();		
-			} else{
-				status = HTTPResponseStatus.S404;	
-				type = MIME.TEXT_HTML.getMime();
+			} else {
+				for (ServersDAO server: ServersManager.getServers()) {
+					content = server.htmlContent(uuid);
+					System.out.println(server.htmlContent(uuid));
+					if (content != null)
+						break;
+				}
+				if (content == null) {
+					status = HTTPResponseStatus.S404;	
+					type = MIME.TEXT_HTML.getMime();
+				}	
 			}
 		}
 	}
