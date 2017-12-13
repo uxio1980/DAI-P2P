@@ -3,6 +3,7 @@ package es.uvigo.esei.dai.hybridserver;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,13 +21,14 @@ public class ServersManager {
 	private HTTPResponseStatus status;
 	private String content;
 	private String type;
-	private static List<ServersDAO> servers = new ArrayList<>();
+	private Map<String, ServersDAO> servers;
 	
 	public ServersManager(Configuration config) throws MalformedURLException {
 		QName name;
 		URL url; 
 		Service service;
 		ServersDAO server;
+		servers = new HashMap<>();
 		
 		for (ServerConfiguration serverConf : config.getServers()){	
 			if(!serverConf.getName().equals("Down Server")){
@@ -34,12 +36,12 @@ public class ServersManager {
 				url = new URL(serverConf.getWsdl());
 				service = Service.create(url, name);
 				server = service.getPort(ServersDAO.class);
-				servers.add(server);
+				servers.put(serverConf.getName(), server);
 			}
 		}
 	}
 	
-	public static List<ServersDAO> getServers(){
+	public Map<String, ServersDAO> getServers(){
 		return servers;
 	}
 

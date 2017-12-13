@@ -11,11 +11,11 @@ import java.util.List;
 import javax.jws.WebService;
 
 @WebService(endpointInterface = "es.uvigo.esei.dai.hybridserver.ServersDAO")
-public class ServersDAODB implements ServersDAO{
+public class ServersDAODB implements ServersDAO {
 
-	private static String userDb;
-	private static String passwordDb;
-	private static String url;
+	private String userDb;
+	private String passwordDb;
+	private String url;
 	
 	public ServersDAODB(Configuration config) {
 		try {
@@ -28,38 +28,53 @@ public class ServersDAODB implements ServersDAO{
 	}
 	
 	@Override
-	public List<String> getHTML() {
+	public String getHTML() {
 		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
 				PreparedStatement statement = connection.prepareStatement(
 				"SELECT * FROM HTML")) {
 			ResultSet result = statement.executeQuery();
-			List<String> list = new ArrayList<>();
 			String uuid;
-
+			StringBuilder sb = new StringBuilder();
+			sb.append("<ul>");
 			while(result.next()) {
 				uuid = result.getString("uuid");
-				list.add(uuid);
+				sb.append("<li><a href='/html?uuid="+ uuid +"' target='_blank'>"+ uuid +"</a></li>");
 			}
-			return list;
+			sb.append("</ul>");
+			return sb.toString();
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}	
 	}
 
 	@Override
-	public List<String> getXML() {
+	public String getXML() {
+		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
+				PreparedStatement statement = connection.prepareStatement(
+				"SELECT * FROM XML")) {
+			ResultSet result = statement.executeQuery();
+			String uuid;
+			StringBuilder sb = new StringBuilder();
+			sb.append("<ul>");
+			while(result.next()) {
+				uuid = result.getString("uuid");
+				sb.append("<li><a href='/xml?uuid="+ uuid +"' target='_blank'>"+ uuid +"</a></li>");
+			}
+			sb.append("</ul>");
+			return sb.toString();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}	
+	}
+
+	@Override
+	public String getXSD() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<String> getXSD() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<String> getXSLT() {
+	public String getXSLT() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -69,7 +84,6 @@ public class ServersDAODB implements ServersDAO{
 		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
 				PreparedStatement statement = connection.prepareStatement(
 				"SELECT * FROM HTML WHERE uuid=?")) {
-			System.out.println(">>>>"+url);
 			statement.setString(1, uuid);
 			ResultSet result = statement.executeQuery();
 
@@ -79,12 +93,24 @@ public class ServersDAODB implements ServersDAO{
 				return null;
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
-		}	}
+		}	
+	}
 
 	@Override
 	public String xmlContent(String uuid) {
-		// TODO Auto-generated method stub
-		return null;
+		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
+				PreparedStatement statement = connection.prepareStatement(
+				"SELECT * FROM XML WHERE uuid=?")) {
+			statement.setString(1, uuid);
+			ResultSet result = statement.executeQuery();
+
+			if (result.next()) {
+				return result.getString("content");
+			} else
+				return null;
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}	
 	}
 
 	@Override

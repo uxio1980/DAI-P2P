@@ -9,16 +9,16 @@ import javax.jws.WebService;
 public interface ServersDAO {
 
 	@WebMethod
-	public List<String> getHTML();
+	public String getHTML();
 	
 	@WebMethod
-	public List<String> getXML();
+	public String getXML();
 	
 	@WebMethod
-	public List<String> getXSD();
+	public String getXSD();
 	
 	@WebMethod
-	public List<String> getXSLT();
+	public String getXSLT();
 	
 	@WebMethod
 	public String htmlContent(String uuid);

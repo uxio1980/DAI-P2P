@@ -8,7 +8,9 @@ import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.xml.namespace.QName;
@@ -32,6 +34,7 @@ public class ClientService implements Runnable {
 	private XsltManager xsltManager;
 	private Configuration config;
 	private ServersManager serversManager;
+	private Map<String, ServersDAO> servers = new HashMap<>();
 
 	/**
 	 * Crea un hilo de cliente e inicializa los parámetros de conexión con la BD.
@@ -56,6 +59,7 @@ public class ClientService implements Runnable {
 		xsdManager = new XsdManager(new XsdDAODB(config));
 		xsltManager = new XsltManager(new XsltDAODB(config));
 		serversManager = new ServersManager(config);
+		servers = serversManager.getServers();
 	}
 	
 	/**
@@ -111,7 +115,7 @@ public class ClientService implements Runnable {
 					switch(resource) {
 					case "html":
 						if(method.equals("GET"))
-							htmlManager.methodGet(request);
+							htmlManager.methodGet(request, servers);
 						else if(method.equals("POST"))
 							htmlManager.methodPost(request);
 						else if(method.equals("DELETE"))
@@ -121,7 +125,7 @@ public class ClientService implements Runnable {
 						break;
 					case "xml":
 						if(method.equals("GET"))
-							xmlManager.methodGet(request, config.getHttpPort());
+							xmlManager.methodGet(request, config.getHttpPort(), servers);
 						else if(method.equals("POST"))
 							xmlManager.methodPost(request);
 						else if(method.equals("DELETE"))

@@ -42,7 +42,7 @@ public class XmlManager {
 	 * @throws ParserConfigurationException 
 	 * @throws TransformerException 
 	 */
-	public void methodGet(HTTPRequest request, int port) 
+	public void methodGet(HTTPRequest request, int port, Map<String, ServersDAO> servers) 
 			throws IOException, TransformerException{
 		params = request.getResourceParameters();
 		uuid = params.get("uuid");
@@ -51,8 +51,19 @@ public class XmlManager {
 		// Comprueba si se recibe el parámetro uuid.
 		if(uuid == null) { 
 			status = HTTPResponseStatus.S200;
-			content = xmlDao.getXmlList(); // Recupera una lista de páginas.
+			//content = xmlDao.getXmlList(); // Recupera una lista de páginas.
 			type = MIME.TEXT_HTML.getMime();
+			StringBuilder sc = new StringBuilder();
+			sc.append("<h1>Local Server</h1>");
+			sc.append(xmlDao.getXmlList()); // Recupera una lista de páginas.
+			for (Map.Entry<String, ServersDAO> server: servers.entrySet()) {
+				sc.append("<h1>" + server.getKey()+"</h1>");
+				sc.append(server.getValue().getXML());
+			}
+			content = sc.toString();
+			if (content.isEmpty()) {
+				status = HTTPResponseStatus.S404;	
+			}
 		}
 		else {
 			// Comprueba si existe la página en el servidor y si tiene plantilla.
@@ -84,10 +95,19 @@ public class XmlManager {
 				content = xmlDao.getXmlPage(uuid);
 				type = MIME.APPLICATION_XML.getMime();
 			}
-			// No existe la página.
-			else{
-				status = HTTPResponseStatus.S404;	
+			else  {
+				status = HTTPResponseStatus.S200;
 				type = MIME.APPLICATION_XML.getMime();
+				for (Map.Entry<String, ServersDAO> server: servers.entrySet()) {
+					content = server.getValue().xmlContent(uuid);
+					if (content != null)
+						break;
+				}
+				// No existe la página.
+				if (content == null || content.isEmpty()){
+					status = HTTPResponseStatus.S404;	
+					type = MIME.APPLICATION_XML.getMime();
+				}
 			}
 		}
 	}

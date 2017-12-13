@@ -1,5 +1,6 @@
 package es.uvigo.esei.dai.hybridserver;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import es.uvigo.esei.dai.hybridserver.http.HTTPRequest;
@@ -28,43 +29,38 @@ public class HtmlManager {
 	 * Lista de todas las páginas, una sola página o un error 404.
 	 * @param request Petición HTTP.
 	 */
-	public void methodGet(HTTPRequest request){
+	public void methodGet(HTTPRequest request, Map<String, ServersDAO> servers){
 		params = request.getResourceParameters();
 		uuid = params.get("uuid");
-
+		type = MIME.TEXT_HTML.getMime();
 		// Comprueba si se recibe el parámetro uuid.
 		if(uuid == null) {  // Recupera una lista de páginas.
 			status = HTTPResponseStatus.S200;
-			content = htmlDao.getHtmlList(); // Recupera una lista de páginas.
-			type = MIME.TEXT_HTML.getMime();
-			if(content.isEmpty()) {
-				for (ServersDAO server: ServersManager.getServers()) {
-					content = server.getHTML().toString();
-					if (!content.isEmpty())
-						break;
-				}
-				if (content.isEmpty()) {
-					status = HTTPResponseStatus.S404;	
-					type = MIME.TEXT_HTML.getMime();
-				}
+			StringBuilder sc = new StringBuilder();
+			sc.append("<h1>Local Server</h1>");
+			sc.append(htmlDao.getHtmlList()); // Recupera una lista de páginas.
+			for (Map.Entry<String, ServersDAO> server: servers.entrySet()) {
+				sc.append("<h1>" + server.getKey()+"</h1>");
+				sc.append(server.getValue().getHTML());
+			}
+			content = sc.toString();
+			if (content.isEmpty()) {
+				status = HTTPResponseStatus.S404;	
 			}
 		}
 		else {
 			status = HTTPResponseStatus.S200;
 			// Comprueba si existe la página en el servidor.
 			if (htmlDao.containsPage(uuid)) {	
-				content = htmlDao.getHtmlPage(uuid);
-				type = MIME.TEXT_HTML.getMime();		
+				content = htmlDao.getHtmlPage(uuid);		
 			} else {
-				for (ServersDAO server: ServersManager.getServers()) {
-					content = server.htmlContent(uuid);
-					System.out.println(server.htmlContent(uuid));
+				for (Map.Entry<String, ServersDAO> server: servers.entrySet()) {
+					content = server.getValue().htmlContent(uuid);
 					if (content != null)
 						break;
 				}
 				if (content == null) {
 					status = HTTPResponseStatus.S404;	
-					type = MIME.TEXT_HTML.getMime();
 				}	
 			}
 		}

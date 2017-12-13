@@ -61,11 +61,13 @@ public class XsltDAODB implements XsltDAO{
 			ResultSet result = statement.executeQuery();
 			StringBuilder sb = new StringBuilder();
 			String uuid;
+			sb.append("<ul>");
 
 			while(result.next()) {
 				uuid = result.getString("uuid");
-				sb.append("<a href='/xslt?uuid="+ uuid +"' target='_blank'>"+ uuid +"</a><br/>");
+				sb.append("<li><a href='/xslt?uuid="+ uuid +"' target='_blank'>"+ uuid +"</a></li>");
 			}
+			sb.append("</ul>");
 			return sb.toString();
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
