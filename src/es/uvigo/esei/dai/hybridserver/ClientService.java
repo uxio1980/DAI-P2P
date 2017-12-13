@@ -135,7 +135,7 @@ public class ClientService implements Runnable {
 						break;
 					case "xsd":
 						if(method.equals("GET"))
-							xsdManager.methodGet(request);
+							xsdManager.methodGet(request, servers);
 						else if(method.equals("POST"))
 							xsdManager.methodPost(request);
 						else if(method.equals("DELETE"))
@@ -145,7 +145,7 @@ public class ClientService implements Runnable {
 						break;
 					case "xslt":
 						if(method.equals("GET"))
-							xsltManager.methodGet(request);
+							xsltManager.methodGet(request, servers);
 						else if(method.equals("POST"))
 							xsltManager.methodPost(request);
 						else if(method.equals("DELETE"))

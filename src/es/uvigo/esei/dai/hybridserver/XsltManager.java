@@ -29,25 +29,41 @@ public class XsltManager {
 	 * Lista de todas las páginas, una sola página o un error 404.
 	 * @param request Petición HTTP.
 	 */
-	public void methodGet(HTTPRequest request){
+	public void methodGet(HTTPRequest request, Map<String, ServersDAO> servers){
 		params = request.getResourceParameters();
 		uuid = params.get("uuid");
 
 		// Comprueba si se recibe el parámetro uuid.
 		if(uuid == null) { 
 			status = HTTPResponseStatus.S200;
-			content = XsltDao.getXsltList(); // Recupera una lista de páginas.
+			StringBuilder sc = new StringBuilder();
+			sc.append("<h1>Local Server</h1>");
+			sc.append(XsltDao.getXsltList()); // Recupera una lista de páginas.
+			for (Map.Entry<String, ServersDAO> server: servers.entrySet()) {
+				sc.append("<h1>" + server.getKey()+"</h1>");
+				sc.append(server.getValue().getXSLT());
+			}
+			content = sc.toString();
+			if (content.isEmpty()) {
+				status = HTTPResponseStatus.S404;	
+			}
 			type = MIME.TEXT_HTML.getMime();
 		}
 		else {
+			type = MIME.APPLICATION_XML.getMime();
+			status = HTTPResponseStatus.S200;
 			// Comprueba si existe la página en el servidor.
-			if (XsltDao.containsPage(uuid)) {
-				status = HTTPResponseStatus.S200;
-				content = XsltDao.getXsltPage(uuid);
-				type = MIME.APPLICATION_XML.getMime();
-			} else{
-				status = HTTPResponseStatus.S404;	
-				type = MIME.APPLICATION_XML.getMime();
+			if (XsltDao.containsPage(uuid)) {	
+				content = XsltDao.getXsltPage(uuid);		
+			} else {
+				for (Map.Entry<String, ServersDAO> server: servers.entrySet()) {
+					content = server.getValue().xsltContent(uuid);
+					if (content != null)
+						break;
+				}
+				if (content == null) {
+					status = HTTPResponseStatus.S404;	
+				}	
 			}
 		}
 	}

@@ -2,6 +2,7 @@ package es.uvigo.esei.dai.hybridserver;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import java.util.UUID;
@@ -56,9 +57,11 @@ public class XmlManager {
 			StringBuilder sc = new StringBuilder();
 			sc.append("<h1>Local Server</h1>");
 			sc.append(xmlDao.getXmlList()); // Recupera una lista de páginas.
-			for (Map.Entry<String, ServersDAO> server: servers.entrySet()) {
-				sc.append("<h1>" + server.getKey()+"</h1>");
-				sc.append(server.getValue().getXML());
+			if(!servers.isEmpty()){
+				for (Map.Entry<String, ServersDAO> server: servers.entrySet()) {
+					sc.append("<h1>" + server.getKey()+"</h1>");
+					sc.append(server.getValue().getXML());
+				}
 			}
 			content = sc.toString();
 			if (content.isEmpty()) {
@@ -66,7 +69,7 @@ public class XmlManager {
 			}
 		}
 		else {
-			// Comprueba si existe la página en el servidor y si tiene plantilla.
+			// Comprueba si existe la página en local y si tiene plantilla.
 			if (xmlDao.containsPage(uuid) && xmlDao.containsTemplate(xslt)) {
 				String xsd = xmlDao.getXmlSchema(xslt);
 				URL urlXml = new URL ("http","localhost",port,"/xml?uuid=" + uuid);					
@@ -89,19 +92,23 @@ public class XmlManager {
 					type = MIME.TEXT_HTML.getMime();
 				}
 			}
-			// XML sin plantilla XSLT.
+			// XML en local y plantilla XSLT en remoto.
 			else if (xmlDao.containsPage(uuid) && xslt==null) {
 				status = HTTPResponseStatus.S200;
 				content = xmlDao.getXmlPage(uuid);
 				type = MIME.APPLICATION_XML.getMime();
+			
 			}
+			// XML y plantilla en remoto.
 			else  {
 				status = HTTPResponseStatus.S200;
 				type = MIME.APPLICATION_XML.getMime();
-				for (Map.Entry<String, ServersDAO> server: servers.entrySet()) {
-					content = server.getValue().xmlContent(uuid);
-					if (content != null)
-						break;
+				if(!servers.isEmpty()){
+					for (Map.Entry<String, ServersDAO> server: servers.entrySet()) {
+						content = server.getValue().xmlContent(uuid);
+						if (content != null)
+							break;
+					}
 				}
 				// No existe la página.
 				if (content == null || content.isEmpty()){
@@ -110,6 +117,27 @@ public class XmlManager {
 				}
 			}
 		}
+	}
+	
+	private String applyXslt(String xslt, String xsd, int port) throws MalformedURLException{
+		URL urlXml = new URL ("http","localhost",port,"/xml?uuid=" + uuid);					
+		URL urlXslt = new URL ("http","localhost",port,"/xslt?uuid=" + xslt);
+		URL urlXsd = new URL ("http","localhost",port,"/xsd?uuid="+xsd);
+		try{
+			DOMParsing.loadAndValidateWithExternalURL(
+				urlXml.toString(), 
+				urlXsd.toString());
+			StringWriter writer = new StringWriter();
+			XSLTUtils.transform(
+					new StreamSource(urlXml.toString()),
+					new StreamSource(urlXslt.toString()),
+					new StreamResult(writer));
+			return writer.toString();
+		} catch(Exception e){
+			status = HTTPResponseStatus.S400;	
+			type = MIME.TEXT_HTML.getMime();
+		}
+		return null;
 	}
 
 	/**

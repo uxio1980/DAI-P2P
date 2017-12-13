@@ -69,14 +69,42 @@ public class ServersDAODB implements ServersDAO {
 
 	@Override
 	public String getXSD() {
-		// TODO Auto-generated method stub
-		return null;
+		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
+				PreparedStatement statement = connection.prepareStatement(
+				"SELECT * FROM XSD")) {
+			ResultSet result = statement.executeQuery();
+			String uuid;
+			StringBuilder sb = new StringBuilder();
+			sb.append("<ul>");
+			while(result.next()) {
+				uuid = result.getString("uuid");
+				sb.append("<li><a href='/xsd?uuid="+ uuid +"' target='_blank'>"+ uuid +"</a></li>");
+			}
+			sb.append("</ul>");
+			return sb.toString();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}	
 	}
 
 	@Override
 	public String getXSLT() {
-		// TODO Auto-generated method stub
-		return null;
+		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
+				PreparedStatement statement = connection.prepareStatement(
+				"SELECT * FROM XSLT")) {
+			ResultSet result = statement.executeQuery();
+			String uuid;
+			StringBuilder sb = new StringBuilder();
+			sb.append("<ul>");
+			while(result.next()) {
+				uuid = result.getString("uuid");
+				sb.append("<li><a href='/xslt?uuid="+ uuid +"' target='_blank'>"+ uuid +"</a></li>");
+			}
+			sb.append("</ul>");
+			return sb.toString();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}	
 	}
 
 	@Override
@@ -115,20 +143,61 @@ public class ServersDAODB implements ServersDAO {
 
 	@Override
 	public String xsdContent(String uuid) {
-		// TODO Auto-generated method stub
-		return null;
+		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
+				PreparedStatement statement = connection.prepareStatement(
+				"SELECT * FROM XSD WHERE uuid=?")) {
+			statement.setString(1, uuid);
+			ResultSet result = statement.executeQuery();
+
+			if (result.next()) {
+				return result.getString("content");
+			} else
+				return null;
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}	
 	}
 
 	@Override
 	public String xsltContent(String uuid) {
-		// TODO Auto-generated method stub
-		return null;
+		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
+				PreparedStatement statement = connection.prepareStatement(
+				"SELECT * FROM XSLT WHERE uuid=?")) {
+			statement.setString(1, uuid);
+			ResultSet result = statement.executeQuery();
+
+			if (result.next()) {
+				return result.getString("content");
+			} else
+				return null;
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}	
 	}
 
 	@Override
 	public String getAssociatedXsd(String uuidXslt) {
-		// TODO Auto-generated method stub
-		return null;
+		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
+				PreparedStatement statement = connection.prepareStatement(
+				"SELECT * FROM XSLT WHERE uuid=?")) {
+			statement.setString(1, uuidXslt);
+			ResultSet result = statement.executeQuery();
+
+			if (result.next()) {
+				String xsd = result.getString("xsd");
+				PreparedStatement statement2 = connection.prepareStatement(
+				"SELECT * FROM XSD WHERE uuid=?");
+				statement2.setString(1, xsd);
+				ResultSet result2 = statement2.executeQuery();
+				if (result2.next())
+					return result2.getString("uuid");
+				else
+					return null;
+			} else
+				return null;
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

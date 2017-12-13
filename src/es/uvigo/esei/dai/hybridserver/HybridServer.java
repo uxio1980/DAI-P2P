@@ -75,7 +75,8 @@ public class HybridServer {
 			@Override
 			public void run() {
 				System.out.print("Publicando servicios web... ");
-				ep = Endpoint.publish(config.getWebServiceURL(), new ServersDAODB(config));
+				if(config != null)
+					ep = Endpoint.publish(config.getWebServiceURL(), new ServersDAODB(config));
 				System.out.println("\t[OK]");
 				System.out.print("Inicializando servidor... ");
 				Socket socket = null;
@@ -87,9 +88,11 @@ public class HybridServer {
 						try  {
 							// Acepta clientes y crea un hilo para cada uno.
 							socket = serverSocket.accept();
-							if (stop) break;	
-							//executor.execute(new ClientService(socket, properties));
-							executor.execute(new ClientService(socket, config));
+							if (stop) break;
+							if(config != null)
+								executor.execute(new ClientService(socket, config));
+							else
+								executor.execute(new ClientService(socket, properties));
 						} 
 						catch (Exception e) {
 							System.out.println("Error en servidor:\n" + e.getMessage());
@@ -125,7 +128,8 @@ public class HybridServer {
 			throw new RuntimeException(e);
 		}
 		executor.shutdownNow();
-		ep.stop();
+		if(config != null)
+			ep.stop();
 		try {
 			executor.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
 		} catch (InterruptedException e) {
