@@ -19,7 +19,7 @@ import es.uvigo.esei.dai.xml.xslt.XSLTUtils;
 
 public class XmlManager {
 
-	private final XmlDAO xmlDao;
+	private XmlDAO xmlDao;
 	private Map<String,String> params;
 	private String uuid;
 	private HTTPResponseStatus status;
@@ -48,7 +48,7 @@ public class XmlManager {
 		params = request.getResourceParameters();
 		uuid = params.get("uuid");
 		String xslt = params.get("xslt");
-
+		
 		// Comprueba si se recibe el parámetro uuid.
 		if(uuid == null) { 
 			status = HTTPResponseStatus.S200;
@@ -72,20 +72,9 @@ public class XmlManager {
 			// Comprueba si existe la página en local y si tiene plantilla.
 			if (xmlDao.containsPage(uuid) && xmlDao.containsTemplate(xslt)) {
 				String xsd = xmlDao.getXmlSchema(xslt);
-				URL urlXml = new URL ("http","localhost",port,"/xml?uuid=" + uuid);					
-				URL urlXslt = new URL ("http","localhost",port,"/xslt?uuid=" + xslt);
-				URL urlXsd = new URL ("http","localhost",port,"/xsd?uuid="+xsd);
 				try{
-					DOMParsing.loadAndValidateWithExternalURL(
-						urlXml.toString(), 
-						urlXsd.toString());
-					StringWriter writer = new StringWriter();
-					XSLTUtils.transform(
-							new StreamSource(urlXml.toString()),
-							new StreamSource(urlXslt.toString()),
-							new StreamResult(writer));
+					content = applyXslt(xslt, xsd, port);
 					status = HTTPResponseStatus.S200;
-					content = writer.toString();
 					type = MIME.TEXT_HTML.getMime();
 				} catch(Exception e){
 					status = HTTPResponseStatus.S400;	
@@ -93,11 +82,30 @@ public class XmlManager {
 				}
 			}
 			// XML en local y plantilla XSLT en remoto.
-			else if (xmlDao.containsPage(uuid) && xslt==null) {
-				status = HTTPResponseStatus.S200;
-				content = xmlDao.getXmlPage(uuid);
-				type = MIME.APPLICATION_XML.getMime();
-			
+			else if (xmlDao.containsPage(uuid) && !xmlDao.containsTemplate(xslt)) {
+				if(!servers.isEmpty()){
+					String xsd = null;
+					for (Map.Entry<String, ServersDAO> server: servers.entrySet()) {
+						xsd = server.getValue().getAssociatedXsd(xslt);
+						if (xsd != null)
+							break;
+					}
+					if(xsd != null){
+						type = MIME.TEXT_HTML.getMime();
+						try{
+							content = applyXslt(xslt, xsd, port);
+							System.out.println(">>>"+content);
+							status = HTTPResponseStatus.S200;
+						} catch(Exception e){
+							e.printStackTrace();
+							status = HTTPResponseStatus.S400;	
+						}
+					}else{
+						status = HTTPResponseStatus.S200;
+						content = xmlDao.getXmlPage(uuid);
+						type = MIME.APPLICATION_XML.getMime();
+					}
+				}
 			}
 			// XML y plantilla en remoto.
 			else  {
@@ -124,6 +132,9 @@ public class XmlManager {
 		URL urlXml = new URL ("http","localhost",port,"/xml?uuid=" + uuid);					
 		URL urlXslt = new URL ("http","localhost",port,"/xslt?uuid=" + xslt);
 		URL urlXsd = new URL ("http","localhost",port,"/xsd?uuid="+xsd);
+		System.out.println(">>"+urlXml);
+		System.out.println(">>"+urlXslt);
+		System.out.println(">>"+urlXsd);
 		DOMParsing.loadAndValidateWithExternalURL(
 			urlXml.toString(), 
 			urlXsd.toString());
