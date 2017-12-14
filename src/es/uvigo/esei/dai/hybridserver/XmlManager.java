@@ -119,25 +119,20 @@ public class XmlManager {
 		}
 	}
 	
-	private String applyXslt(String xslt, String xsd, int port) throws MalformedURLException{
+	private String applyXslt(String xslt, String xsd, int port) 
+			throws TransformerException, ParserConfigurationException, SAXException, IOException{
 		URL urlXml = new URL ("http","localhost",port,"/xml?uuid=" + uuid);					
 		URL urlXslt = new URL ("http","localhost",port,"/xslt?uuid=" + xslt);
 		URL urlXsd = new URL ("http","localhost",port,"/xsd?uuid="+xsd);
-		try{
-			DOMParsing.loadAndValidateWithExternalURL(
-				urlXml.toString(), 
-				urlXsd.toString());
-			StringWriter writer = new StringWriter();
-			XSLTUtils.transform(
-					new StreamSource(urlXml.toString()),
-					new StreamSource(urlXslt.toString()),
-					new StreamResult(writer));
-			return writer.toString();
-		} catch(Exception e){
-			status = HTTPResponseStatus.S400;	
-			type = MIME.TEXT_HTML.getMime();
-		}
-		return null;
+		DOMParsing.loadAndValidateWithExternalURL(
+			urlXml.toString(), 
+			urlXsd.toString());
+		StringWriter writer = new StringWriter();
+		XSLTUtils.transform(
+				new StreamSource(urlXml.toString()),
+				new StreamSource(urlXslt.toString()),
+				new StreamResult(writer));
+		return writer.toString();
 	}
 
 	/**

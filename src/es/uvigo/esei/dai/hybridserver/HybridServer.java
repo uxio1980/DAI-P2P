@@ -74,10 +74,10 @@ public class HybridServer {
 		this.serverThread = new Thread() {
 			@Override
 			public void run() {
-				System.out.print("Publicando servicios web... ");
-				if(config != null)
+				System.out.println("Publicando servicios web... ");
+				try{
 					ep = Endpoint.publish(config.getWebServiceURL(), new ServersDAODB(config));
-				System.out.println("\t[OK]");
+				}catch(Exception e){}
 				System.out.print("Inicializando servidor... ");
 				Socket socket = null;
 				try (final ServerSocket serverSocket = new ServerSocket(service_port)) {

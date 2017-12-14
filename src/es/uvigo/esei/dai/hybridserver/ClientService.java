@@ -125,7 +125,7 @@ public class ClientService implements Runnable {
 						break;
 					case "xml":
 						if(method.equals("GET"))
-							xmlManager.methodGet(request, config.getHttpPort(), servers);
+							xmlManager.methodGet(request, socket.getLocalPort(), servers);
 						else if(method.equals("POST"))
 							xmlManager.methodPost(request);
 						else if(method.equals("DELETE"))
@@ -156,6 +156,7 @@ public class ClientService implements Runnable {
 					}
 					// Si se produce un error no experado en la BD lanza un error 500.
 				} catch(Exception e) {
+					//e.printStackTrace();
 					setResponse(HTTPResponseStatus.S500, null, resource);
 					out.println(getResponse());
 				}
