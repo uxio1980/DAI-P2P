@@ -128,7 +128,7 @@ public class HybridServer {
 			throw new RuntimeException(e);
 		}
 		executor.shutdownNow();
-		if(config != null)
+		if(ep != null)
 			ep.stop();
 		try {
 			executor.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);

@@ -2,6 +2,7 @@ package es.uvigo.esei.dai.xml.dom;
 
 
 import java.io.File;
+import java.io.FileWriter;
 
 import java.io.IOException;
 
@@ -22,6 +23,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import es.uvigo.esei.dai.xml.SimpleErrorHandler;
@@ -36,7 +38,7 @@ public class DOMParsing {
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		
 		// Parsing del documento
-		return builder.parse(new File(documentPath));
+		return builder.parse(documentPath);
 	}
 	
 	public static Document loadAndValidateWithInternalDTD(String documentPath) 
@@ -98,9 +100,20 @@ public class DOMParsing {
 			throws ParserConfigurationException, SAXException, IOException {
 				// Construcción del schema		
 
+		File xml = new File("file.xml");
+		File xsd = new File("file.xsd");
+		FileWriter xmlWriter = new FileWriter(xml);
+		FileWriter xsdWriter = new FileWriter(xsd);
+		xmlWriter.write(documentPath);
+		xmlWriter.flush();
+		xmlWriter.close();
+		xsdWriter.write(schemaPath);
+		xsdWriter.flush();
+		xsdWriter.close();
+		
 		SchemaFactory schemaFactory = 
 			SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		Schema schema = schemaFactory.newSchema(new StreamSource(schemaPath));
+		Schema schema = schemaFactory.newSchema(xsd);
 		
 		// Construcción del parser del documento. Se establece el esquema y se activa
 		// la validación y comprobación de namespaces
@@ -112,8 +125,8 @@ public class DOMParsing {
 		// Se añade el manejador de errores
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		builder.setErrorHandler(new SimpleErrorHandler());
-		
-		return builder.parse(documentPath);
+
+		return builder.parse(xml);
 	}
 	
 	public static String toXML(Document document)

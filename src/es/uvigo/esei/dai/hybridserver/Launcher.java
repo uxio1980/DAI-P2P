@@ -27,7 +27,6 @@ public class Launcher {
 			server.start();
 		}
 		else if (args.length == 4 ){
-			//Properties dataConfig = loadParameters(args[0]); 
 			XMLConfigurationLoader cl = new XMLConfigurationLoader();
 			Configuration c1 = cl.load(new File(args[0]));
 			Configuration c2 = cl.load(new File(args[1]));

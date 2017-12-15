@@ -54,27 +54,27 @@ public class XmlDAODB implements XmlDAO{
 	}
 	
 	public String getXmlSchema(String xslt){
-		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
-				PreparedStatement statement = connection.prepareStatement(
-				"SELECT * FROM XSLT WHERE uuid=?")) {
-			statement.setString(1, xslt);
-			ResultSet result = statement.executeQuery();
-
-			if (result.next()) {
-				String xsd = result.getString("xsd");
-				PreparedStatement statement2 = connection.prepareStatement(
-				"SELECT * FROM XSD WHERE uuid=?");
-				statement2.setString(1, xsd);
-				ResultSet result2 = statement2.executeQuery();
-				if (result2.next())
-					return result2.getString("uuid");
-				else
-					return null;
-			} else
-				return null;
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		}
+		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb); 
+	        PreparedStatement statement = connection.prepareStatement( 
+	        "SELECT * FROM XSLT WHERE uuid=?")) { 
+	      statement.setString(1, xslt); 
+	      ResultSet result = statement.executeQuery(); 
+	 
+	      if (result.next()) { 
+	        String xsd = result.getString("xsd"); 
+	        PreparedStatement statement2 = connection.prepareStatement( 
+	        "SELECT * FROM XSD WHERE uuid=?"); 
+	        statement2.setString(1, xsd); 
+	        ResultSet result2 = statement2.executeQuery(); 
+	        if (result2.next()) 
+	          return result2.getString("content"); 
+	        else 
+	          return null; 
+	      } else 
+	        return null; 
+	    } catch (SQLException e) { 
+	      throw new RuntimeException(e); 
+	    } 
 	}
 
 	@Override

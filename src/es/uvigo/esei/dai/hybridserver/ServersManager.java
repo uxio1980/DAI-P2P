@@ -31,13 +31,13 @@ public class ServersManager {
 		servers = new HashMap<>();
 		
 		for (ServerConfiguration serverConf : config.getServers()){	
-			if(!serverConf.getName().equals("Down Server")){
-				name = new QName(serverConf.getNamespace(), "ServersDAODBService");
-				url = new URL(serverConf.getWsdl());
+			name = new QName(serverConf.getNamespace(), "ServersDAODBService");
+			url = new URL(serverConf.getWsdl());
+			try{
 				service = Service.create(url, name);
 				server = service.getPort(ServersDAO.class);
 				servers.put(serverConf.getName(), server);
-			}
+			} catch(Exception e){}
 		}
 	}
 	

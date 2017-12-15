@@ -5,9 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.jws.WebService;
 
 @WebService(endpointInterface = "es.uvigo.esei.dai.hybridserver.ServersDAO")
@@ -177,19 +174,27 @@ public class ServersDAODB implements ServersDAO {
 
 	@Override
 	public String getAssociatedXsd(String uuidXslt) {
-		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb);
-				PreparedStatement statement = connection.prepareStatement(
-				"SELECT * FROM XSLT WHERE uuid=?")) {
-			statement.setString(1, uuidXslt);
-			ResultSet result = statement.executeQuery();
-
-			if (result.next()) {
-				return result.getString("xsd");
-			} else
-				return null;
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		}
+		try (Connection connection = DriverManager.getConnection(url, userDb, passwordDb); 
+	        PreparedStatement statement = connection.prepareStatement( 
+	        "SELECT * FROM XSLT WHERE uuid=?")) { 
+	      statement.setString(1, uuidXslt); 
+	      ResultSet result = statement.executeQuery(); 
+	 
+	      if (result.next()) { 
+	        String xsd = result.getString("xsd"); 
+	        PreparedStatement statement2 = connection.prepareStatement( 
+	        "SELECT * FROM XSD WHERE uuid=?"); 
+	        statement2.setString(1, xsd); 
+	        ResultSet result2 = statement2.executeQuery(); 
+	        if (result2.next()) 
+	          return result2.getString("content"); 
+	        else 
+	          return null; 
+	      } else 
+	        return null; 
+	    } catch (SQLException e) { 
+	      throw new RuntimeException(e); 
+	    } 
 	}
 
 }

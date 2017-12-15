@@ -5,17 +5,10 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.Socket;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
-
 import es.uvigo.esei.dai.hybridserver.http.HTTPHeaders;
 import es.uvigo.esei.dai.hybridserver.http.HTTPParseException;
 import es.uvigo.esei.dai.hybridserver.http.HTTPRequest;
@@ -25,6 +18,8 @@ import es.uvigo.esei.dai.hybridserver.http.MIME;
 
 public class ClientService implements Runnable {
 
+	@SuppressWarnings("unused")
+	private Configuration config;
 	private Socket socket;
 	private HTTPResponse response;
 	private final String[] RESOURCES = {"html","xml","xsd","xslt"};
@@ -32,7 +27,6 @@ public class ClientService implements Runnable {
 	private XmlManager xmlManager;
 	private XsdManager xsdManager;
 	private XsltManager xsltManager;
-	private Configuration config;
 	private ServersManager serversManager;
 	private Map<String, ServersDAO> servers = new HashMap<>();
 
