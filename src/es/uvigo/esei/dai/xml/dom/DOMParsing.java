@@ -125,8 +125,10 @@ public class DOMParsing {
 		// Se añade el manejador de errores
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		builder.setErrorHandler(new SimpleErrorHandler());
-
-		return builder.parse(xml);
+		Document document = builder.parse(xml); 
+		xml.delete();
+		xsd.delete();
+		return document;
 	}
 	
 	public static String toXML(Document document)

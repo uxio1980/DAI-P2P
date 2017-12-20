@@ -159,6 +159,7 @@ public class XmlManager {
 				new StreamSource(xmlFile),
 				new StreamSource(urlXslt.toString()),
 				new StreamResult(writer));
+		xmlFile.delete();
 		return writer.toString();
 	}
 
